@@ -88,3 +88,5 @@ disqusShortname = "yourdiscussshortname"
         name = "Contact me"
         weight = 5
         url = "/contact/"
+
+disqusShortname = "jlopezper"
