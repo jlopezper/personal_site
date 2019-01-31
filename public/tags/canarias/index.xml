@@ -22,5 +22,15 @@ El encuentro se realizará en la Sociedad de Promoción Económica de Gran Canar
 La inscripción y propuesta de charlas (!</description>
     </item>
     
+    <item>
+      <title>Encuentro de usuarios R en Canarias</title>
+      <link>/posts/2019-02-01-blogdown/</link>
+      <pubDate>Thu, 31 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/2019-02-01-blogdown/</guid>
+      <description>The first thing I’d recommend to anyone who wants to build a website from R using blogdown is to read the book of the author of this package, Yihui Xie.
+Therefore, this post isn’t intended to be a guide on how to make your own website but a way to tell my experience through the process. The details of what each folder should contain within the project are fully and very well explained on the book linked above.</description>
+    </item>
+    
   </channel>
 </rss>

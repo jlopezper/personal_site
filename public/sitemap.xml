@@ -8,6 +8,11 @@
   </url>
   
   <url>
+    <loc>/posts/2019-02-01-blogdown/</loc>
+    <lastmod>2019-01-31T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/categories/rstats/</loc>
     <lastmod>2019-01-31T00:00:00+00:00</lastmod>
     <priority>0</priority>

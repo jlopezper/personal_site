@@ -1,0 +1,19 @@
+---
+title: "Encuentro de usuarios R en Canarias"
+author: "Jorge López"
+date: 2019-01-31
+categories: ["#rstats"]
+tags: ["Encuentro usuarios", "Canarias"]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The first thing I'd recommend to anyone who wants to build a website from R using `blogdown` is to read the [book](https://bookdown.org/yihui/blogdown/) of the author of this package, Yihui Xie.
+
+Therefore, this post isn't intended to be a guide on how to make your own website but a way to tell my experience through the process. The details of what each folder should contain within the project are fully and very well explained on the book linked above.
+
+Before creating any R project, you obviously must install the `blogdown` package and not just for using the functions this package provides but also for creating the R project from RStudio. Once installed with `install.packages("blogdown")` you can create the project in RStudio by clicking at File --> New Project. Then you will find the following menu:
+
+![](../../static/img/image1_blogdown.png)
