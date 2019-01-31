@@ -64,7 +64,7 @@ disqusShortname = "jlopezper"
         # You can configure the theme parameter for each language.
         [languages.en.params]
         author = "Jorge López Pérez"
-        info = "Economist / Data Scientist /R"
+        info = "Economist / Data Scientist / R"
         description = "Personal website"
         keywords = "blog,developer,personal"
 
