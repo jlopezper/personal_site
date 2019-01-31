@@ -1,18 +1,14 @@
 baseurl = "https://jorgelopez.netlify.com/"
 title = "jorgelopez"
-
 theme = "hugo-coder"
-
 languagecode = "en"
-
 paginate = 20
 canonifyurls = true
-
 pygmentsstyle = "b2"
 pygmentscodefences = true
 pygmentscodefencesguesssyntax = true
-
 disqusShortname = "jlopezper"
+
 
 [params]
     author = "Jorge López Pérez"
@@ -68,7 +64,7 @@ disqusShortname = "jlopezper"
         # You can configure the theme parameter for each language.
         [languages.en.params]
         author = "Jorge López Pérez"
-        info = "Economist / Data Scientist / R"
+        info = "Economist / Data Scientist /R"
         description = "Personal website"
         keywords = "blog,developer,personal"
 
@@ -93,5 +89,3 @@ disqusShortname = "jlopezper"
         name = "Contact"
         weight = 5
         url = "/contact/"
-
-disqusShortname = "jlopezper"
