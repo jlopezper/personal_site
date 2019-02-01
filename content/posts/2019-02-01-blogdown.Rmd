@@ -17,3 +17,7 @@ Therefore, this post isn't intended to be a guide on how to make your own websit
 Before creating any R project, you obviously must install the `blogdown` package and not just for using the functions this package provides but also for creating the R project from RStudio. Once installed with `install.packages("blogdown")` you can create the project in RStudio by clicking at File --> New Project. Then you will find the following menu:
 
 ![](/posts/2019-02-01-blogdown_files/image1_blogdown.jpg)
+
+And then you will find:
+
+![](/posts/2019-02-01-blogdown_files/image2_blogdown.jpg)
