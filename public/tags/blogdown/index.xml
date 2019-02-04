@@ -6,7 +6,7 @@
     <description>Recent content in Blogdown on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 31 Jan 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 04 Feb 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/blogdown/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>Making my own website with blogdown</title>
       <link>/posts/2019-02-01-blogdown/</link>
-      <pubDate>Thu, 31 Jan 2019 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 04 Feb 2019 00:00:00 +0000</pubDate>
       
       <guid>/posts/2019-02-01-blogdown/</guid>
       <description>The first thing I’d recommend to anyone who wants to build a website from R using blogdown is to read the book of the author of this package, Yihui Xie.

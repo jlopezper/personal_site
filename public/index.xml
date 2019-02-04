@@ -6,10 +6,20 @@
     <description>Recent content on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 31 Jan 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 04 Feb 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Making my own website with blogdown</title>
+      <link>/posts/2019-02-01-blogdown/</link>
+      <pubDate>Mon, 04 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/2019-02-01-blogdown/</guid>
+      <description>The first thing I’d recommend to anyone who wants to build a website from R using blogdown is to read the book of the author of this package, Yihui Xie.
+Therefore, this post isn’t intended to be a guide on how to make your own website but a way to tell my experience through the process. The details of what each folder should contain within the project are fully and very well explained on the book linked above.</description>
+    </item>
     
     <item>
       <title>Encuentro de usuarios R en Canarias</title>
@@ -20,16 +30,6 @@
       <description>Nada me complace más que iniciar esta nueva web y blog anunciando que el próximo 25 de marzo se llevará a cabo la primera reunión de usuarios de R –#rstats– en Canarias.
 El encuentro se realizará en la Sociedad de Promoción Económica de Gran Canaria durante todo el día y estará organizado por el también reciente grupo de usuarios de R en Canarias.
 La inscripción y propuesta de charlas (!</description>
-    </item>
-    
-    <item>
-      <title>Making my own website with blogdown</title>
-      <link>/posts/2019-02-01-blogdown/</link>
-      <pubDate>Thu, 31 Jan 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/posts/2019-02-01-blogdown/</guid>
-      <description>The first thing I’d recommend to anyone who wants to build a website from R using blogdown is to read the book of the author of this package, Yihui Xie.
-Therefore, this post isn’t intended to be a guide on how to make your own website but a way to tell my experience through the process. The details of what each folder should contain within the project are fully and very well explained on the book linked above.</description>
     </item>
     
     <item>

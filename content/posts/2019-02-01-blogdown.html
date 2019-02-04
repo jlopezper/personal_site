@@ -1,7 +1,7 @@
 ---
 title: "Making my own website with blogdown"
 author: "Jorge López"
-date: 2019-01-31
+date: 2019-02-04
 categories: ["#rstats"]
 tags: ["blogdown"]
 ---
@@ -15,9 +15,21 @@ tags: ["blogdown"]
 <img src="/posts/2019-02-01-blogdown_files/image1_blogdown.jpg" />
 
 </div>
-<p>And then you will find:</p>
+<p>After selecting “Website using blogdown” you’ll find this:</p>
 <div class="figure">
 <img src="/posts/2019-02-01-blogdown_files/image2_blogdown.jpg" />
 
 </div>
-<p>(To be continued…)</p>
+<p>Here you can create a new R project based on the blogdown package. I’d recommend leaving all boxes options by default. The only thing I changed was the Hugo theme. Hugo is a static website engine written in Go and it’s integrated into the blogdown ecosystem. The package provides a blog theme which is originally based on the <a href="https://github.com/jrutheiser/hugo-lithium-theme">Lithium theme</a>. For me, this template is pretty good but it’s worth checking some others available <a href="https://themes.gohugo.io/">here</a>. In particular, my choice was the minimalist <a href="https://themes.gohugo.io/hugo-coder/">Hugo Coder</a> template.</p>
+<p>I’m not going into the details of the folder structure but you can find further information in the book and whether you kept checked the “Add the example site of the theme” box you’ll see some example posts. In summary, even without reading the full book it’s quite acceptable to follow the code.</p>
+<p>One of the main files is located in the project root path and it’s called <code>config.toml</code>. This file consists in a set of keys with their respective values separated by section names. Here you define the main parameters of your site. For instance, in my case the params section contains:</p>
+<pre><code>[params]
+    author = &quot;Jorge López Pérez&quot;
+    description = &quot;Jorge&#39;s personal website&quot;
+    keywords = &quot;blog,developer,personal&quot;
+    info = &quot;Economist and Data Scientist&quot;
+    avatarurl = &quot;images/autopic.jpeg&quot;
+    footercontent = &quot;&quot;</code></pre>
+<p>I think this file should be barely modified and in my particular case I just touched it for removing the second language that this theme provided and also for adding <a href="https://disqus.com/">disqus</a>.</p>
+<p>Once the site is written and can be deployed you have <a href="https://bookdown.org/yihui/blogdown/deployment.html">several options</a>. I strongly recommend (as the authors do) Netlify. You can sign up with you Github account and link it with Netlify. I also recommend hosting all the code in a Github repo in order to ease the deployment. I just have to note that I had some problems related to my Hugo theme, which require a certain Hugo extended version not compatible with Netlify. The issue can be found <a href="https://github.com/netlify/binrc/issues/16">here</a> and for me the solution was to compile the site downloading Hugo and calling it from terminal. I think the <code>hugo_build()</code> function in blogdown allows to do the same from R. This was neccesary just the first time for me since now every time I push my code to Github the site is compiled in Netlify. Also be aware of updating the Hugo Version in the Netlify environment variables (in my case, 0.53).</p>
+<p>Well, this is all from my side, I hope you enjoy making your own site using blogdown and I’d really like to thank the <a href="https://bookdown.org/yihui/blogdown/author.html">authors</a> for this awesome and useful package and book.</p>
