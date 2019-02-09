@@ -1,0 +1,49 @@
+---
+title: Getting public holidays by country
+author: 'Jorge López'
+date: '2019-02-08'
+slug: getting-public-holidays-by-country
+categories:
+  - '#rstats'
+tags: []
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I've been recently working on a time series model to which I wanted to include the public holidays of Spain and Portugal. After trying different approaches I decided to move forward with [`prophet`](https://facebook.github.io/prophet/) which, by the way, I strongly recommend it.
+
+But this post comes to my mind because I'd like to tell some options we have to get the public holidays by country. I don't want to go into details about the specificities of what a public holidays mean (regional or local ones are excluded in this analysis, for example). 
+
+The first thing I did was to search for an existing R package and I couldn't find anything. As a colleague pointed me this package would likely suffer from a strong maintenance. However, as `prophet` has a built-in function to include holidays, I considered to look into the code and I found that the package provides a data.frame with the holidays from 1995 to 2044 for many countries (there are around 100 different country names but I think half of them are country codes).
+
+For many purposes this dataframe would suffice but it's weird for me to load `prophet` just for taking advantage of this data. So I decided to keep exploring and I found [holidayapi.com](https://holidayapi.com/) which provides an API to access the data but I realized that the free account is limited so I didn't deepen here. 
+
+Fortunately [date.nager.at](https://date.nager.at/) provides the same information but also an open [API](https://date.nager.at/Home/Api) so with the following simple function we can access to the data:
+
+```{r message=FALSE, warning=FALSE}
+library(httr)
+library(dplyr)
+library(magrittr)
+library(purrr)
+
+get_holidays <- function(country_code, year) {
+  # Build URL
+  url <- parse_url("http://date.nager.at")
+  url$path <- paste0("api/v1/get/", country_code, "/", year)
+  base_url <- build_url(url)
+  
+  # Get content from the site
+  content_json <- content(GET(base_url))
+  
+  # Extract only relevant fields
+  df <- map_df(content_json, extract, c("countryCode", "name", "date"))
+  df
+}
+
+get_holidays(country_code = "AT", year = 2019)
+```
+
+
+

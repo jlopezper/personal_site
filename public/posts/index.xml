@@ -6,10 +6,20 @@
     <description>Recent content in Posts on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 04 Feb 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 08 Feb 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Getting public holidays by country</title>
+      <link>/posts/getting-public-holidays-by-country/</link>
+      <pubDate>Fri, 08 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/getting-public-holidays-by-country/</guid>
+      <description>I’ve been recently working on a time series model to which I wanted to include the public holidays of Spain and Portugal. After trying different approaches I decided to move forward with prophet which, by the way, I strongly recommend it.
+But this post comes to my mind because I’d like to tell some options we have to get the public holidays by country. I don’t want to go into details about the specificities of what a public holidays mean (regional or local ones are excluded in this analysis, for example).</description>
+    </item>
     
     <item>
       <title>Making my own website with blogdown</title>

@@ -1,0 +1,70 @@
+---
+title: Getting public holidays by country
+author: 'Jorge López'
+date: '2019-02-08'
+slug: getting-public-holidays-by-country
+categories:
+  - '#rstats'
+tags: []
+---
+
+
+
+<p>I’ve been recently working on a time series model to which I wanted to include the public holidays of Spain and Portugal. After trying different approaches I decided to move forward with <a href="https://facebook.github.io/prophet/"><code>prophet</code></a> which, by the way, I strongly recommend it.</p>
+<p>But this post comes to my mind because I’d like to tell some options we have to get the public holidays by country. I don’t want to go into details about the specificities of what a public holidays mean (regional or local ones are excluded in this analysis, for example).</p>
+<p>The first thing I did was to search for an existing R package and I couldn’t find anything. As a colleague pointed me this package would likely suffer from a strong maintenance. However, as <code>prophet</code> has a built-in function to include holidays, I considered to look into the code and I found that the package provides a data.frame with the holidays from 1995 to 2044 for many countries (there are around 100 different country names but I think half of them are country codes).</p>
+<p>For many purposes this dataframe would suffice but it’s weird for me to load <code>prophet</code> just for taking advantage of this data. So I decided to keep exploring and I found <a href="https://holidayapi.com/">holidayapi.com</a> which provides an API to access the data but I realized that the free account is limited so I didn’t deepen here.</p>
+<p>Fortunately <a href="https://date.nager.at/">date.nager.at</a> provides the same information but also an open <a href="https://date.nager.at/Home/Api">API</a> so with the following simple function we can access to the data:</p>
+<pre class="r"><code>library(httr)
+library(dplyr)
+library(magrittr)
+library(purrr)
+
+get_holidays &lt;- function(country_code, year) {
+  # Build URL
+  url &lt;- parse_url(&quot;http://date.nager.at&quot;)
+  url$path &lt;- paste0(&quot;api/v1/get/&quot;, country_code, &quot;/&quot;, year)
+  base_url &lt;- build_url(url)
+  
+  # Get content from the site
+  content_json &lt;- content(GET(base_url))
+  
+  # Extract only relevant fields
+  df &lt;- map_df(content_json, extract, c(&quot;countryCode&quot;, &quot;name&quot;, &quot;date&quot;))
+  df
+}</code></pre>
+<p>And the output:</p>
+<pre class="r"><code>get_holidays(country_code = &quot;AT&quot;, year = 2019)</code></pre>
+<pre><code>## # A tibble: 13 x 3
+##    countryCode name                  date      
+##    &lt;chr&gt;       &lt;chr&gt;                 &lt;chr&gt;     
+##  1 AT          New Year&#39;s Day        2019-01-01
+##  2 AT          Epiphany              2019-01-06
+##  3 AT          Easter Monday         2019-04-22
+##  4 AT          National Holiday      2019-05-01
+##  5 AT          Ascension Day         2019-05-30
+##  6 AT          Whit Monday           2019-06-10
+##  7 AT          Corpus Christi        2019-06-20
+##  8 AT          Assumption Day        2019-08-15
+##  9 AT          National Holiday      2019-10-26
+## 10 AT          All Saints&#39; Day       2019-11-01
+## 11 AT          Immaculate Conception 2019-12-08
+## 12 AT          Christmas Day         2019-12-25
+## 13 AT          St. Stephen&#39;s Day     2019-12-26</code></pre>
+<p>And for several years:</p>
+<pre class="r"><code>years &lt;- c(&quot;2016&quot;, &quot;2017&quot;, &quot;2018&quot;, &quot;2019&quot;)
+map_df(years, function(x) get_holidays(&quot;AT&quot;, x))</code></pre>
+<pre><code>## # A tibble: 52 x 3
+##    countryCode name             date      
+##    &lt;chr&gt;       &lt;chr&gt;            &lt;chr&gt;     
+##  1 AT          New Year&#39;s Day   2016-01-01
+##  2 AT          Epiphany         2016-01-06
+##  3 AT          Easter Monday    2016-03-28
+##  4 AT          National Holiday 2016-05-01
+##  5 AT          Ascension Day    2016-05-05
+##  6 AT          Whit Monday      2016-05-16
+##  7 AT          Corpus Christi   2016-05-26
+##  8 AT          Assumption Day   2016-08-15
+##  9 AT          National Holiday 2016-10-26
+## 10 AT          All Saints&#39; Day  2016-11-01
+## # … with 42 more rows</code></pre>
