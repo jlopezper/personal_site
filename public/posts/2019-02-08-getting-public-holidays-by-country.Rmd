@@ -58,3 +58,10 @@ years <- c("2016", "2017", "2018", "2019")
 map_df(years, function(x) get_holidays("AT", x))
 ```
 
+
+After all, I still find two main drawbacks.
+
+1. I haven't analyzed the data quality and I don't know exactly if someone is maintaining this website.
+2. It'd be interesting to include regional and local holidays and, in addition, a label with relevant days (Black Friday, for example).
+
+Does anyone have a better approach?
