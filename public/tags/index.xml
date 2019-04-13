@@ -2,39 +2,48 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Jorge López</title>
-    <link>/tags/</link>
+    <link>https://jorgelopez.netlify.com/tags/</link>
     <description>Recent content in Tags on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Mon, 04 Feb 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://jorgelopez.netlify.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Blogdown</title>
-      <link>/tags/blogdown/</link>
+      <link>https://jorgelopez.netlify.com/tags/blogdown/</link>
       <pubDate>Mon, 04 Feb 2019 00:00:00 +0000</pubDate>
       
-      <guid>/tags/blogdown/</guid>
+      <guid>https://jorgelopez.netlify.com/tags/blogdown/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Canarias</title>
-      <link>/tags/canarias/</link>
+      <link>https://jorgelopez.netlify.com/tags/canarias/</link>
       <pubDate>Thu, 31 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>/tags/canarias/</guid>
+      <guid>https://jorgelopez.netlify.com/tags/canarias/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Encuentro Usuarios</title>
-      <link>/tags/encuentro-usuarios/</link>
+      <link>https://jorgelopez.netlify.com/tags/encuentro-usuarios/</link>
       <pubDate>Thu, 31 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>/tags/encuentro-usuarios/</guid>
+      <guid>https://jorgelopez.netlify.com/tags/encuentro-usuarios/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Gganimate</title>
+      <link>https://jorgelopez.netlify.com/tags/gganimate/</link>
+      <pubDate>Sat, 13 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jorgelopez.netlify.com/tags/gganimate/</guid>
       <description></description>
     </item>
     

@@ -2,41 +2,52 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Jorge López</title>
-    <link>/</link>
+    <link>https://jorgelopez.netlify.com/</link>
     <description>Recent content on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 08 Feb 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 13 Apr 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://jorgelopez.netlify.com/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>Making some stuff with gganimate</title>
+      <link>https://jorgelopez.netlify.com/posts/making-some-stuff-with-gganimate/</link>
+      <pubDate>Sat, 13 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jorgelopez.netlify.com/posts/making-some-stuff-with-gganimate/</guid>
+      <description>I wanted to make some stuff with the gganimate package since I was aware of the existence of the new API. Yesterday I found the data I was seeking in order to move forward!
+El País and its team are making an effort to collect data from many different pollsters and also calibrate some statistical models. The methodology is also explained in the previous link.
+My goal here was just focused on trying gganimate, so here is the reproducible example (and the result):</description>
+    </item>
+    
+    <item>
       <title>Getting public holidays by country</title>
-      <link>/posts/getting-public-holidays-by-country/</link>
+      <link>https://jorgelopez.netlify.com/posts/getting-public-holidays-by-country/</link>
       <pubDate>Fri, 08 Feb 2019 00:00:00 +0000</pubDate>
       
-      <guid>/posts/getting-public-holidays-by-country/</guid>
+      <guid>https://jorgelopez.netlify.com/posts/getting-public-holidays-by-country/</guid>
       <description>I’ve been recently working on a time series model to which I wanted to include the public holidays of Spain and Portugal. After trying different approaches I decided to move forward with prophet which, by the way, I strongly recommend it.
 But this post comes to my mind because I’d like to tell some options we have to get the public holidays by country. I don’t want to go into details about the specificities of what a public holidays mean (regional or local ones are excluded in this analysis, for example).</description>
     </item>
     
     <item>
       <title>Making my own website with blogdown</title>
-      <link>/posts/2019-02-01-blogdown/</link>
+      <link>https://jorgelopez.netlify.com/posts/2019-02-01-blogdown/</link>
       <pubDate>Mon, 04 Feb 2019 00:00:00 +0000</pubDate>
       
-      <guid>/posts/2019-02-01-blogdown/</guid>
+      <guid>https://jorgelopez.netlify.com/posts/2019-02-01-blogdown/</guid>
       <description>The first thing I’d recommend to anyone who wants to build a website from R using blogdown is to read the book of the author of this package, Yihui Xie.
 Therefore, this post isn’t intended to be a guide on how to make your own website but a way to tell my experience through the process. The details of what each folder should contain within the project are fully and very well explained on the book linked above.</description>
     </item>
     
     <item>
       <title>Encuentro de usuarios R en Canarias</title>
-      <link>/posts/2019-01-31-encuentro-usuarios-r/</link>
+      <link>https://jorgelopez.netlify.com/posts/2019-01-31-encuentro-usuarios-r/</link>
       <pubDate>Thu, 31 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>/posts/2019-01-31-encuentro-usuarios-r/</guid>
+      <guid>https://jorgelopez.netlify.com/posts/2019-01-31-encuentro-usuarios-r/</guid>
       <description>Nada me complace más que iniciar esta nueva web y blog anunciando que el próximo 25 de marzo se llevará a cabo la primera reunión de usuarios de R –#rstats– en Canarias.
 El encuentro se realizará en la Sociedad de Promoción Económica de Gran Canaria durante todo el día y estará organizado por el también reciente grupo de usuarios de R en Canarias.
 La inscripción y propuesta de charlas (!</description>
@@ -44,10 +55,10 @@ La inscripción y propuesta de charlas (!</description>
     
     <item>
       <title>About me / Sobre mí</title>
-      <link>/about/</link>
+      <link>https://jorgelopez.netlify.com/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>/about/</guid>
+      <guid>https://jorgelopez.netlify.com/about/</guid>
       <description>Born and raised in Gran Canaria, the Canary Islands, in northwest Africa.
 I graduated in Economics at University of Las Palmas de Gran Canaria with a MSc in Statistics at Polytechnic University of Catalonia in the lovely Barcelona (2017). On the professional side, I am currently working as a Data Scientist at Kernel Analytics.
 I am a R enthusiast as well as interested in Statistics, Economics, Politics and… a devoted supporter of my football team, UD Las Palmas.</description>
@@ -55,19 +66,19 @@ I am a R enthusiast as well as interested in Statistics, Economics, Politics and
     
     <item>
       <title>Contact</title>
-      <link>/contact/</link>
+      <link>https://jorgelopez.netlify.com/contact/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>/contact/</guid>
+      <guid>https://jorgelopez.netlify.com/contact/</guid>
       <description>Feel free to contact me through my email.</description>
     </item>
     
     <item>
       <title>Projects</title>
-      <link>/projects/</link>
+      <link>https://jorgelopez.netlify.com/projects/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>/projects/</guid>
+      <guid>https://jorgelopez.netlify.com/projects/</guid>
       <description>Nothing to see here&amp;hellip; Move along!</description>
     </item>
     

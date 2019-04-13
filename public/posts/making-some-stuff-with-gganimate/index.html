@@ -10,18 +10,18 @@
     <meta name="keywords" content="blog,developer,personal">
 
     <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Encuentro de usuarios R en Canarias"/>
-<meta name="twitter:description" content="Nada me complace más que iniciar esta nueva web y blog anunciando que el próximo 25 de marzo se llevará a cabo la primera reunión de usuarios de R –#rstats– en Canarias.
-El encuentro se realizará en la Sociedad de Promoción Económica de Gran Canaria durante todo el día y estará organizado por el también reciente grupo de usuarios de R en Canarias.
-La inscripción y propuesta de charlas (!"/>
+<meta name="twitter:title" content="Making some stuff with gganimate"/>
+<meta name="twitter:description" content="I wanted to make some stuff with the gganimate package since I was aware of the existence of the new API. Yesterday I found the data I was seeking in order to move forward!
+El País and its team are making an effort to collect data from many different pollsters and also calibrate some statistical models. The methodology is also explained in the previous link.
+My goal here was just focused on trying gganimate, so here is the reproducible example (and the result):"/>
 
 
-    <base href="https://jorgelopez.netlify.com/posts/2019-01-31-encuentro-usuarios-r/">
+    <base href="https://jorgelopez.netlify.com/posts/making-some-stuff-with-gganimate/">
     <title>
-  Encuentro de usuarios R en Canarias · Jorge López
+  Making some stuff with gganimate · Jorge López
 </title>
 
-    <link rel="canonical" href="https://jorgelopez.netlify.com/posts/2019-01-31-encuentro-usuarios-r/">
+    <link rel="canonical" href="https://jorgelopez.netlify.com/posts/making-some-stuff-with-gganimate/">
 
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Merriweather:300,700|Source+Code+Pro:400,700" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous" />
@@ -88,19 +88,19 @@ La inscripción y propuesta de charlas (!"/>
     <article>
       <header>
         <div class="post-title">
-          <h1 class="title">Encuentro de usuarios R en Canarias</h1>
+          <h1 class="title">Making some stuff with gganimate</h1>
         </div>
         <div class="post-meta">
           <div class="date">
             <span class="posted-on">
               <i class="fas fa-calendar"></i>
-              <time datetime='2019-01-31T00:00:00Z'>
-                January 31, 2019
+              <time datetime='2019-04-13T00:00:00Z'>
+                April 13, 2019
               </time>
             </span>
             <span class="reading-time">
               <i class="fas fa-clock"></i>
-              One minute read
+              2 minutes read
             </span>
           </div>
           <div class="categories">
@@ -109,9 +109,7 @@ La inscripción y propuesta de charlas (!"/>
 
           <div class="tags">
   <i class="fas fa-tag"></i>
-    <a href="https://jorgelopez.netlify.com/tags/encuentro-usuarios/">Encuentro usuarios</a>
-      <span class="separator">•</span>
-    <a href="https://jorgelopez.netlify.com/tags/canarias/">Canarias</a></div>
+    <a href="https://jorgelopez.netlify.com/tags/gganimate/">gganimate</a></div>
 
         </div>
       </header>
@@ -120,9 +118,60 @@ La inscripción y propuesta de charlas (!"/>
         
 
 
-<p>Nada me complace más que iniciar esta nueva web y blog anunciando que el próximo 25 de marzo se llevará a cabo la primera reunión de usuarios de R –<code>#rstats</code>– en Canarias.</p>
-<p>El encuentro se realizará en la <a href="https://www.spegc.org/">Sociedad de Promoción Económica de Gran Canaria</a> durante todo el día y estará organizado por el también reciente <a href="https://twitter.com/canarias_r">grupo de usuarios de R en Canarias</a>.</p>
-<p>La inscripción y propuesta de charlas (!) ya está abierta (<a href="https://www.spegc.org/formacion-y-eventos/encuentro-usuarios-de-r/">enlace</a>). ¡Anímate a participar!</p>
+<p>I wanted to make some stuff with the gganimate package since I was aware of the existence of the <a href="https://github.com/thomasp85/gganimate#gganimate-">new API</a>. Yesterday I found the data I was seeking in order to move forward!</p>
+<p><a href="https://elpais.com/especiales/2019/elecciones-generales/encuestas-electorales/">El País and its team</a> are making an effort to collect data from many different pollsters and also calibrate some statistical models. The methodology is also explained in the previous link.</p>
+<p>My goal here was just focused on trying gganimate, so here is the reproducible example (and the result):</p>
+<pre class="r"><code>library(readr)
+library(tidyr)
+library(ggplot2)
+library(gifski)
+library(gganimate)
+library(dplyr)
+
+tst &lt;- readr::read_csv(&quot;https://elpais.com/especiales/2019/elecciones-generales/encuestas-electorales/ficheros/tabla.csv?1554807308&quot;, 
+                       col_types = cols(
+                         date = col_date(format = &quot;%d/%m/%y&quot;),
+                         house = col_character(),
+                         sample = col_double(),
+                         turnout = col_double(),
+                         PP = col_double(),
+                         PSOE = col_double(),
+                         UP = col_double(),
+                         Cs = col_double(),
+                         ERC = col_double(),
+                         PDC = col_double(),
+                         PNV = col_double(),
+                         PAC = col_double(),
+                         BIL = col_double(),
+                         CC = col_double(),
+                         VOX = col_double(),
+                         COM = col_double()
+                       ))
+
+gga &lt;-
+  tst %&gt;% 
+  select(date, house, PP, PSOE, UP, Cs, VOX) %&gt;% 
+  gather(key = partido, voto, PP, PSOE, UP, Cs, VOX) %&gt;% 
+  filter(!is.na(voto) &amp; house %in% c(&#39;cis&#39;, &#39;celeste-tel&#39;, &#39;metroscopia&#39;,
+                                     &#39;gad3&#39;, &#39;invymark&#39;, &#39;sigma dos&#39;)) %&gt;% 
+  ggplot(aes(x = date, y = voto, color = partido)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  scale_color_manual(values=c(&quot;#EE9A00&quot;, &quot;#27408B&quot;, &quot;#8B1A1A&quot;,&quot;#A020F0&quot;, &quot;#458B00&quot;)) +
+  labs(x = &#39;Date&#39;, y = &#39;Vote estimation (%)&#39;, color = &#39;Political Party&#39;) +
+  theme(legend.position = &quot;bottom&quot;, 
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=14, face=&quot;bold&quot;),
+        legend.title = element_text(size = 12, face=&quot;bold&quot;),
+        legend.text = element_text(size = 12),
+        strip.text = element_text(size = 14)) +
+  facet_wrap(~ house) +
+  transition_reveal(date) + 
+  shadow_mark()
+
+gganimate::animate(gga, height = 550, width = 900, nframes = 150)</code></pre>
+<p><img src="https://jorgelopez.netlify.com/posts/2019-04-13-making-some-stuff-with-gganimate_files/figure-html/unnamed-chunk-1-1.gif" /><!-- --></p>
 
       </div>
 

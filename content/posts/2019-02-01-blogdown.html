@@ -10,16 +10,10 @@ tags: ["blogdown"]
 
 <p>The first thing I’d recommend to anyone who wants to build a website from R using <code>blogdown</code> is to read the <a href="https://bookdown.org/yihui/blogdown/">book</a> of the author of this package, Yihui Xie.</p>
 <p>Therefore, this post isn’t intended to be a guide on how to make your own website but a way to tell my experience through the process. The details of what each folder should contain within the project are fully and very well explained on the book linked above.</p>
-<p>Before creating any R project, you obviously must install the <code>blogdown</code> package and not just for using the functions this package provides but also for creating the R project from RStudio. Once installed with <code>install.packages(&quot;blogdown&quot;)</code> you can create the project in RStudio by clicking at File –&gt; New Project. Then you will find the following menu:</p>
-<div class="figure">
-<img src="/posts/2019-02-01-blogdown_files/image1_blogdown.jpg" />
-
-</div>
+<p>Before creating any R project, you obviously must install the <code>blogdown</code> package and not just for using the functions this package provides but also for creating the R project from RStudio. Once installed with <code>install.packages("blogdown")</code> you can create the project in RStudio by clicking at File –&gt; New Project. Then you will find the following menu:</p>
+<p><img src="/posts/2019-02-01-blogdown_files/image1_blogdown.jpg" /></p>
 <p>After selecting “Website using blogdown” you’ll find this:</p>
-<div class="figure">
-<img src="/posts/2019-02-01-blogdown_files/image2_blogdown.jpg" />
-
-</div>
+<p><img src="/posts/2019-02-01-blogdown_files/image2_blogdown.jpg" /></p>
 <p>Here you can create a new R project based on the blogdown package. I’d recommend leaving all boxes options by default. The only thing I changed was the Hugo theme. Hugo is a static website engine written in Go and it’s integrated into the blogdown ecosystem. The package provides a blog theme which is originally based on the <a href="https://github.com/jrutheiser/hugo-lithium-theme">Lithium theme</a>. For me, this template is pretty good but it’s worth checking some others available <a href="https://themes.gohugo.io/">here</a>. In particular, my choice was the minimalist <a href="https://themes.gohugo.io/hugo-coder/">Hugo Coder</a> template.</p>
 <p>I’m not going into the details of the folder structure but you can find further information in the book and whether you kept checked the “Add the example site of the theme” box you’ll see some example posts. In summary, even without reading the full book it’s quite acceptable to follow the code.</p>
 <p>One of the main files is located in the project root path and it’s called <code>config.toml</code>. This file consists in a set of keys with their respective values separated by section names. Here you define the main parameters of your site. For instance, in my case the params section contains:</p>
