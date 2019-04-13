@@ -1,0 +1,72 @@
+---
+title: Making some stuff with gganimate
+author: 'Jorge López'
+date: '2019-04-13'
+slug: making-some-stuff-with-gganimate
+categories:
+  - '#rstats'
+tags: ["gganimate"]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I wanted to make some stuff with the gganimate package since I was aware of the existence of the [new API](https://github.com/thomasp85/gganimate#gganimate-). Yesterday I found the data I was seeking in order to move forward!
+
+[El País and its team](https://elpais.com/especiales/2019/elecciones-generales/encuestas-electorales/) are making an effort to collect data from many different pollsters and also calibrate some statistical models. The methodology is also explained in the previous link.
+
+My goal here was just focused on trying gganimate, so here is the reproducible example (and the result):
+
+```{r message=FALSE, warning=FALSE}
+library(readr)
+library(tidyr)
+library(ggplot2)
+library(gifski)
+library(gganimate)
+library(dplyr)
+
+tst <- readr::read_csv("https://elpais.com/especiales/2019/elecciones-generales/encuestas-electorales/ficheros/tabla.csv?1554807308", 
+                       col_types = cols(
+                         date = col_date(format = "%d/%m/%y"),
+                         house = col_character(),
+                         sample = col_double(),
+                         turnout = col_double(),
+                         PP = col_double(),
+                         PSOE = col_double(),
+                         UP = col_double(),
+                         Cs = col_double(),
+                         ERC = col_double(),
+                         PDC = col_double(),
+                         PNV = col_double(),
+                         PAC = col_double(),
+                         BIL = col_double(),
+                         CC = col_double(),
+                         VOX = col_double(),
+                         COM = col_double()
+                       ))
+
+gga <-
+  tst %>% 
+  select(date, house, PP, PSOE, UP, Cs, VOX) %>% 
+  gather(key = partido, voto, PP, PSOE, UP, Cs, VOX) %>% 
+  filter(!is.na(voto) & house %in% c('cis', 'celeste-tel', 'metroscopia',
+                                     'gad3', 'invymark', 'sigma dos')) %>% 
+  ggplot(aes(x = date, y = voto, color = partido)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  scale_color_manual(values=c("#EE9A00", "#27408B", "#8B1A1A","#A020F0", "#458B00")) +
+  labs(x = 'Date', y = 'Vote estimation (%)', color = 'Political Party') +
+  theme(legend.position = "bottom", 
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=14, face="bold"),
+        legend.title = element_text(size = 12, face="bold"),
+        legend.text = element_text(size = 12),
+        strip.text = element_text(size = 14)) +
+  facet_wrap(~ house) +
+  transition_reveal(date) + 
+  shadow_mark()
+
+gganimate::animate(gga, height = 550, width = 900, nframes = 150)
+```
