@@ -2,31 +2,31 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on Jorge López</title>
-    <link>https://jorgelopez.netlify.com/posts/</link>
+    <link>/posts/</link>
     <description>Recent content in Posts on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Fri, 22 Nov 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://jorgelopez.netlify.com/posts/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Análisis de texto con R: jugando un poco con tidytext</title>
-      <link>https://jorgelopez.netlify.com/posts/analisis-de-texto-con-r-jugando-un-poco-con-tidytext/</link>
+      <link>/posts/analisis-de-texto-con-r-jugando-un-poco-con-tidytext/</link>
       <pubDate>Fri, 22 Nov 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://jorgelopez.netlify.com/posts/analisis-de-texto-con-r-jugando-un-poco-con-tidytext/</guid>
+      <guid>/posts/analisis-de-texto-con-r-jugando-un-poco-con-tidytext/</guid>
       <description>Hace unos meses me leí el libro de Text Mining with R de Julia Silge y David Robinson. En él, los autores introducen el término tidy text format para referirse a la adaptación de los principios del tidyverse a todo lo referido al análisis de texto. Si te interesa el tema, una lectura muy recomendable.
 Una de las cosas que me interesaba comprobar es cuán fácil es replicar algunos análisis del libro con datos reales (los del libro también lo son, pero evidentemente los ejemplos son agradecidos) y también con texto en español.</description>
     </item>
     
     <item>
       <title>Making some stuff with gganimate</title>
-      <link>https://jorgelopez.netlify.com/posts/making-some-stuff-with-gganimate/</link>
+      <link>/posts/making-some-stuff-with-gganimate/</link>
       <pubDate>Sat, 13 Apr 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://jorgelopez.netlify.com/posts/making-some-stuff-with-gganimate/</guid>
+      <guid>/posts/making-some-stuff-with-gganimate/</guid>
       <description>I wanted to make some stuff with the gganimate package since I was aware of the existence of the new API. Yesterday I found the data I was seeking in order to move forward!
 El País and its team are making an effort to collect data from many different pollsters and also calibrate some statistical models. The methodology is also explained in the previous link.
 My goal here was just focused on trying gganimate, so here is the reproducible example (and the result):</description>
@@ -34,30 +34,30 @@ My goal here was just focused on trying gganimate, so here is the reproducible e
     
     <item>
       <title>Getting public holidays by country</title>
-      <link>https://jorgelopez.netlify.com/posts/getting-public-holidays-by-country/</link>
+      <link>/posts/getting-public-holidays-by-country/</link>
       <pubDate>Fri, 08 Feb 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://jorgelopez.netlify.com/posts/getting-public-holidays-by-country/</guid>
+      <guid>/posts/getting-public-holidays-by-country/</guid>
       <description>I’ve been recently working on a time series model to which I wanted to include the public holidays of Spain and Portugal. After trying different approaches I decided to move forward with prophet which, by the way, I strongly recommend it.
 But this post comes to my mind because I’d like to tell some options we have to get the public holidays by country. I don’t want to go into details about the specificities of what a public holidays mean (regional or local ones are excluded in this analysis, for example).</description>
     </item>
     
     <item>
       <title>Making my own website with blogdown</title>
-      <link>https://jorgelopez.netlify.com/posts/2019-02-01-blogdown/</link>
+      <link>/posts/2019-02-01-blogdown/</link>
       <pubDate>Mon, 04 Feb 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://jorgelopez.netlify.com/posts/2019-02-01-blogdown/</guid>
+      <guid>/posts/2019-02-01-blogdown/</guid>
       <description>The first thing I’d recommend to anyone who wants to build a website from R using blogdown is to read the book of the author of this package, Yihui Xie.
 Therefore, this post isn’t intended to be a guide on how to make your own website but a way to tell my experience through the process. The details of what each folder should contain within the project are fully and very well explained on the book linked above.</description>
     </item>
     
     <item>
       <title>Encuentro de usuarios R en Canarias</title>
-      <link>https://jorgelopez.netlify.com/posts/2019-01-31-encuentro-usuarios-r/</link>
+      <link>/posts/2019-01-31-encuentro-usuarios-r/</link>
       <pubDate>Thu, 31 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://jorgelopez.netlify.com/posts/2019-01-31-encuentro-usuarios-r/</guid>
+      <guid>/posts/2019-01-31-encuentro-usuarios-r/</guid>
       <description>Nada me complace más que iniciar esta nueva web y blog anunciando que el próximo 25 de marzo se llevará a cabo la primera reunión de usuarios de R –#rstats– en Canarias.
 El encuentro se realizará en la Sociedad de Promoción Económica de Gran Canaria durante todo el día y estará organizado por el también reciente grupo de usuarios de R en Canarias.
 La inscripción y propuesta de charlas (!</description>
