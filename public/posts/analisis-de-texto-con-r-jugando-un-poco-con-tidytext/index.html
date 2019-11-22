@@ -15,12 +15,12 @@
 Una de las cosas que me interesaba comprobar es cuán fácil es replicar algunos análisis del libro con datos reales (los del libro también lo son, pero evidentemente los ejemplos son agradecidos) y también con texto en español."/>
 
 
-    <base href="/posts/analisis-de-texto-con-r-jugando-un-poco-con-tidytext/">
+    <base href="https://jorgelopez.netlify.com/posts/analisis-de-texto-con-r-jugando-un-poco-con-tidytext/">
     <title>
   Análisis de texto con R: jugando un poco con tidytext · Jorge López
 </title>
 
-    <link rel="canonical" href="/posts/analisis-de-texto-con-r-jugando-un-poco-con-tidytext/">
+    <link rel="canonical" href="https://jorgelopez.netlify.com/posts/analisis-de-texto-con-r-jugando-un-poco-con-tidytext/">
 
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Merriweather:300,700|Source+Code+Pro:400,700" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous" />
@@ -29,7 +29,7 @@ Una de las cosas que me interesaba comprobar es cuán fácil es replicar algunos
     
       
       
-      <link rel="stylesheet" href="/css/coder.min.ac37073bc2826cd28ef57364a9fe339de7ebcb26dafc22fd832cb35cf5b1d048.css" integrity="sha256-rDcHO8KCbNKO9XNkqf4znefryyba/CL9gyyzXPWx0Eg=" crossorigin="anonymous" media="screen" />
+      <link rel="stylesheet" href="https://jorgelopez.netlify.com/css/coder.min.ac37073bc2826cd28ef57364a9fe339de7ebcb26dafc22fd832cb35cf5b1d048.css" integrity="sha256-rDcHO8KCbNKO9XNkqf4znefryyba/CL9gyyzXPWx0Eg=" crossorigin="anonymous" media="screen" />
     
 
     
@@ -38,8 +38,8 @@ Una de las cosas que me interesaba comprobar es cuán fácil es replicar algunos
 
     
 
-    <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
-    <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="https://jorgelopez.netlify.com/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="https://jorgelopez.netlify.com/images/favicon-16x16.png" sizes="16x16">
 
     
 
@@ -50,7 +50,7 @@ Una de las cosas que me interesaba comprobar es cuán fácil es replicar algunos
     <main class="wrapper">
       <nav class="navigation">
   <section class="container">
-    <a class="navigation-title" href="/">
+    <a class="navigation-title" href="https://jorgelopez.netlify.com/">
       Jorge López
     </a>
     <input type="checkbox" id="menu-toggle" />
@@ -59,19 +59,19 @@ Una de las cosas que me interesaba comprobar es cuán fácil es replicar algunos
       
         
           <li class="navigation-item">
-            <a class="navigation-link" href="/about/">About</a>
+            <a class="navigation-link" href="https://jorgelopez.netlify.com/about/">About</a>
           </li>
         
           <li class="navigation-item">
-            <a class="navigation-link" href="/posts/">Blog</a>
+            <a class="navigation-link" href="https://jorgelopez.netlify.com/posts/">Blog</a>
           </li>
         
           <li class="navigation-item">
-            <a class="navigation-link" href="/projects/">Projects</a>
+            <a class="navigation-link" href="https://jorgelopez.netlify.com/projects/">Projects</a>
           </li>
         
           <li class="navigation-item">
-            <a class="navigation-link" href="/contact/">Contact</a>
+            <a class="navigation-link" href="https://jorgelopez.netlify.com/contact/">Contact</a>
           </li>
         
       
@@ -104,7 +104,7 @@ Una de las cosas que me interesaba comprobar es cuán fácil es replicar algunos
           </div>
           <div class="categories">
   <i class="fas fa-folder"></i>
-    <a href="/categories/#rstats/">#rstats</a></div>
+    <a href="https://jorgelopez.netlify.com/categories/rstats/">rstats</a></div>
 
           
         </div>
@@ -156,7 +156,7 @@ rt_all &lt;- bind_rows(rt, rt_net)</code></pre>
     subtitle = &quot;Tuits agregados usando intervalos de 1 hora&quot;,
     caption = &quot;\n@jlopezper&quot;
   )</code></pre>
-<p><img src="/posts/2019-11-22-analisis-de-texto-con-r-jugando-un-poco-con-tidytext_files/figure-html/unnamed-chunk-4-1.png" width="960" /></p>
+<p><img src="https://jorgelopez.netlify.com/posts/2019-11-22-analisis-de-texto-con-r-jugando-un-poco-con-tidytext_files/figure-html/unnamed-chunk-4-1.png" width="960" /></p>
 <p>De acuerdo, ahora vamos limpiar un poco los tuits y dejarlos en formato <em>tidy</em> (one-token-per-row). Lo hacemos en tres pasos:</p>
 <ol style="list-style-type: decimal">
 <li>Limpiamos todas las URL de enlaces que aparezcan en los tuits.</li>
@@ -174,18 +174,18 @@ rt_all &lt;- bind_rows(rt, rt_net)</code></pre>
 # este seria el resultado
 sample_n(tidy_rt, 10)</code></pre>
 <pre><code>## # A tibble: 10 x 3
-##    created_at          screen_name     word        
-##    &lt;dttm&gt;              &lt;chr&gt;           &lt;chr&gt;       
-##  1 2019-11-16 20:38:29 gcald           clubes      
-##  2 2019-11-17 17:35:07 Pondo01         vs          
-##  3 2019-11-21 15:31:13 HerenciaInsular social      
-##  4 2019-11-16 18:14:19 laprovincia_es  fortes      
-##  5 2019-11-17 16:28:29 OliverMarrero1  entiendo    
-##  6 2019-11-21 23:30:45 DInfeliz        udlp_oficial
-##  7 2019-11-17 13:55:05 joseleramos7    ver         
-##  8 2019-11-14 23:31:22 juanluistf1978  sefutbol    
-##  9 2019-11-17 12:00:32 UDLPAddict      palmas      
-## 10 2019-11-17 12:05:14 el_neso         conoce</code></pre>
+##    created_at          screen_name    word         
+##    &lt;dttm&gt;              &lt;chr&gt;          &lt;chr&gt;        
+##  1 2019-11-15 18:59:39 Nena_Go        pacogcaridad 
+##  2 2019-11-17 12:47:28 pinflopy       fácil        
+##  3 2019-11-21 14:11:09 TodoGolesRadio logrado      
+##  4 2019-11-22 12:48:56 AdayQsd        ramirezveteya
+##  5 2019-11-15 14:24:00 TodoGolesRadio lista        
+##  6 2019-11-15 14:16:40 Angel_RJ93     ansu         
+##  7 2019-11-18 16:26:44 Canary23403964 cuenta       
+##  8 2019-11-17 11:56:09 Nestor_Guti89  ud           
+##  9 2019-11-19 15:43:41 vwcanarias     udlp_oficial 
+## 10 2019-11-18 03:41:15 Alejandro_Lpes hoy</code></pre>
 <p>Una pregunta natural: ¿cuáles son las palabras más frecuentes?</p>
 <pre class="r"><code>tidy_rt %&gt;%
   count(word, sort = TRUE) %&gt;%
@@ -201,7 +201,7 @@ sample_n(tidy_rt, 10)</code></pre>
   geom_col() + 
   coord_flip() +
   theme_minimal()</code></pre>
-<p><img src="/posts/2019-11-22-analisis-de-texto-con-r-jugando-un-poco-con-tidytext_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
+<p><img src="https://jorgelopez.netlify.com/posts/2019-11-22-analisis-de-texto-con-r-jugando-un-poco-con-tidytext_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
 <p>También se puede ver con la clásica nube de palabras en donde se ve alguna cosa curiosa:</p>
 <ul>
 <li>Hay dos enteros (1, 2), que hacen referencia al resultado del último partido (2-1).</li>
@@ -218,7 +218,7 @@ sample_n(tidy_rt, 10)</code></pre>
                             random.order = FALSE,
                             rot.per = 0.3,
                             colors = brewer.pal(8,&quot;Dark2&quot;)))</code></pre>
-<p><img src="/posts/2019-11-22-analisis-de-texto-con-r-jugando-un-poco-con-tidytext_files/figure-html/fig1-1.png" width="576" /></p>
+<p><img src="https://jorgelopez.netlify.com/posts/2019-11-22-analisis-de-texto-con-r-jugando-un-poco-con-tidytext_files/figure-html/fig1-1.png" width="576" /></p>
 <p>Ahora vamos con algo de análisis de sentimiento. Para ello, tomamos el siguiente <a href="https://www.kaggle.com/rtatman/sentiment-lexicons-for-81-languages/version/1">diccionario de sentimientos</a>. En honor a la verdad, no está muy pulido y he visto errores que he corregido sobre la marcha, pero vale para una primera intentona.</p>
 <pre class="r"><code>positive_words &lt;-
   read_csv(here::here(&quot;resources&quot;, &quot;data&quot;, &quot;positive_words_es.txt&quot;), col_names = &quot;word&quot;) %&gt;%
@@ -248,7 +248,7 @@ sentiment_words &lt;- bind_rows(positive_words, negative_words)</code></pre>
        title = &quot;Palabras relacionadas a cada sentimiento&quot;,
        caption = &quot;\n@jlopezper&quot;) +
   theme_minimal()</code></pre>
-<p><img src="/posts/2019-11-22-analisis-de-texto-con-r-jugando-un-poco-con-tidytext_files/figure-html/unnamed-chunk-9-1.png" width="960" /></p>
+<p><img src="https://jorgelopez.netlify.com/posts/2019-11-22-analisis-de-texto-con-r-jugando-un-poco-con-tidytext_files/figure-html/unnamed-chunk-9-1.png" width="960" /></p>
 
       </div>
 

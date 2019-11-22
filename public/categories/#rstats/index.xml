@@ -6,31 +6,10 @@
     <description>Recent content in #rstats on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 22 Nov 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 08 Feb 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/#rstats/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Análisis de texto con R: jugando un poco con tidytext</title>
-      <link>/posts/analisis-de-texto-con-r-jugando-un-poco-con-tidytext/</link>
-      <pubDate>Fri, 22 Nov 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/posts/analisis-de-texto-con-r-jugando-un-poco-con-tidytext/</guid>
-      <description>Hace unos meses me leí el libro de Text Mining with R de Julia Silge y David Robinson. En él, los autores introducen el término tidy text format para referirse a la adaptación de los principios del tidyverse a todo lo referido al análisis de texto. Si te interesa el tema, una lectura muy recomendable.
-Una de las cosas que me interesaba comprobar es cuán fácil es replicar algunos análisis del libro con datos reales (los del libro también lo son, pero evidentemente los ejemplos son agradecidos) y también con texto en español.</description>
-    </item>
-    
-    <item>
-      <title>Making some stuff with gganimate</title>
-      <link>/posts/making-some-stuff-with-gganimate/</link>
-      <pubDate>Sat, 13 Apr 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/posts/making-some-stuff-with-gganimate/</guid>
-      <description>I wanted to make some stuff with the gganimate package since I was aware of the existence of the new API. Yesterday I found the data I was seeking in order to move forward!
-El País and its team are making an effort to collect data from many different pollsters and also calibrate some statistical models. The methodology is also explained in the previous link.
-My goal here was just focused on trying gganimate, so here is the reproducible example (and the result):</description>
-    </item>
     
     <item>
       <title>Getting public holidays by country</title>

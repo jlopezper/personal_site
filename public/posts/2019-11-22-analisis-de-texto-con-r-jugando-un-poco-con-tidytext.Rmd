@@ -4,7 +4,7 @@ author: Jorge López
 date: '2019-11-22'
 slug: analisis-de-texto-con-r-jugando-un-poco-con-tidytext
 categories:
-  - '#rstats'
+  - 'rstats'
 tags: []
 description: ''
 externalLink: ''

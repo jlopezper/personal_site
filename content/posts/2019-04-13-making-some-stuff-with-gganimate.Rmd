@@ -4,7 +4,7 @@ author: 'Jorge López'
 date: '2019-04-13'
 slug: making-some-stuff-with-gganimate
 categories:
-  - '#rstats'
+  - 'rstats'
 tags: ["gganimate"]
 ---
 

@@ -4,7 +4,7 @@ author: Jorge López
 date: '2019-11-22'
 slug: analisis-de-texto-con-r-jugando-un-poco-con-tidytext
 categories:
-  - '#rstats'
+  - 'rstats'
 tags: []
 description: ''
 externalLink: ''
@@ -72,18 +72,18 @@ rt_all &lt;- bind_rows(rt, rt_net)</code></pre>
 # este seria el resultado
 sample_n(tidy_rt, 10)</code></pre>
 <pre><code>## # A tibble: 10 x 3
-##    created_at          screen_name     word        
-##    &lt;dttm&gt;              &lt;chr&gt;           &lt;chr&gt;       
-##  1 2019-11-16 20:38:29 gcald           clubes      
-##  2 2019-11-17 17:35:07 Pondo01         vs          
-##  3 2019-11-21 15:31:13 HerenciaInsular social      
-##  4 2019-11-16 18:14:19 laprovincia_es  fortes      
-##  5 2019-11-17 16:28:29 OliverMarrero1  entiendo    
-##  6 2019-11-21 23:30:45 DInfeliz        udlp_oficial
-##  7 2019-11-17 13:55:05 joseleramos7    ver         
-##  8 2019-11-14 23:31:22 juanluistf1978  sefutbol    
-##  9 2019-11-17 12:00:32 UDLPAddict      palmas      
-## 10 2019-11-17 12:05:14 el_neso         conoce</code></pre>
+##    created_at          screen_name    word         
+##    &lt;dttm&gt;              &lt;chr&gt;          &lt;chr&gt;        
+##  1 2019-11-15 18:59:39 Nena_Go        pacogcaridad 
+##  2 2019-11-17 12:47:28 pinflopy       fácil        
+##  3 2019-11-21 14:11:09 TodoGolesRadio logrado      
+##  4 2019-11-22 12:48:56 AdayQsd        ramirezveteya
+##  5 2019-11-15 14:24:00 TodoGolesRadio lista        
+##  6 2019-11-15 14:16:40 Angel_RJ93     ansu         
+##  7 2019-11-18 16:26:44 Canary23403964 cuenta       
+##  8 2019-11-17 11:56:09 Nestor_Guti89  ud           
+##  9 2019-11-19 15:43:41 vwcanarias     udlp_oficial 
+## 10 2019-11-18 03:41:15 Alejandro_Lpes hoy</code></pre>
 <p>Una pregunta natural: ¿cuáles son las palabras más frecuentes?</p>
 <pre class="r"><code>tidy_rt %&gt;%
   count(word, sort = TRUE) %&gt;%
