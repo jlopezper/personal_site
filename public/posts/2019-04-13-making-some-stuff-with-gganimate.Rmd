@@ -26,32 +26,15 @@ library(gifski)
 library(gganimate)
 library(dplyr)
 
-tst <- readr::read_csv("https://elpais.com/especiales/2019/elecciones-generales/encuestas-electorales/ficheros/tabla.csv?1554807308", 
-                       col_types = cols(
-                         date = col_date(format = "%d/%m/%y"),
-                         house = col_character(),
-                         sample = col_double(),
-                         turnout = col_double(),
-                         PP = col_double(),
-                         PSOE = col_double(),
-                         UP = col_double(),
-                         Cs = col_double(),
-                         ERC = col_double(),
-                         PDC = col_double(),
-                         PNV = col_double(),
-                         PAC = col_double(),
-                         BIL = col_double(),
-                         CC = col_double(),
-                         VOX = col_double(),
-                         COM = col_double()
-                       ))
+tst <- readr::read_csv("https://elpais.com/especiales/2019/elecciones-generales/encuestas-electorales/ficheros/tabla.csv?1554807308")
 
 gga <-
   tst %>% 
   select(date, house, PP, PSOE, UP, Cs, VOX) %>% 
   gather(key = partido, voto, PP, PSOE, UP, Cs, VOX) %>% 
-  filter(!is.na(voto) & house %in% c('cis', 'celeste-tel', 'metroscopia',
-                                     'gad3', 'invymark', 'sigma dos')) %>% 
+  mutate(date = lubridate::as_date(date)) %>% 
+  filter(!is.na(date) & house %in% c('electopanel', 'sociométrica', 'imop',
+                                     'gad3', 'hamalgama', 'gesop')) %>% 
   ggplot(aes(x = date, y = voto, color = partido)) +
   geom_line() +
   geom_point() +

@@ -20,32 +20,15 @@ library(gifski)
 library(gganimate)
 library(dplyr)
 
-tst &lt;- readr::read_csv(&quot;https://elpais.com/especiales/2019/elecciones-generales/encuestas-electorales/ficheros/tabla.csv?1554807308&quot;, 
-                       col_types = cols(
-                         date = col_date(format = &quot;%d/%m/%y&quot;),
-                         house = col_character(),
-                         sample = col_double(),
-                         turnout = col_double(),
-                         PP = col_double(),
-                         PSOE = col_double(),
-                         UP = col_double(),
-                         Cs = col_double(),
-                         ERC = col_double(),
-                         PDC = col_double(),
-                         PNV = col_double(),
-                         PAC = col_double(),
-                         BIL = col_double(),
-                         CC = col_double(),
-                         VOX = col_double(),
-                         COM = col_double()
-                       ))
+tst &lt;- readr::read_csv(&quot;https://elpais.com/especiales/2019/elecciones-generales/encuestas-electorales/ficheros/tabla.csv?1554807308&quot;)
 
 gga &lt;-
   tst %&gt;% 
   select(date, house, PP, PSOE, UP, Cs, VOX) %&gt;% 
   gather(key = partido, voto, PP, PSOE, UP, Cs, VOX) %&gt;% 
-  filter(!is.na(voto) &amp; house %in% c(&#39;cis&#39;, &#39;celeste-tel&#39;, &#39;metroscopia&#39;,
-                                     &#39;gad3&#39;, &#39;invymark&#39;, &#39;sigma dos&#39;)) %&gt;% 
+  mutate(date = lubridate::as_date(date)) %&gt;% 
+  filter(!is.na(date) &amp; house %in% c(&#39;electopanel&#39;, &#39;sociométrica&#39;, &#39;imop&#39;,
+                                     &#39;gad3&#39;, &#39;hamalgama&#39;, &#39;gesop&#39;)) %&gt;% 
   ggplot(aes(x = date, y = voto, color = partido)) +
   geom_line() +
   geom_point() +

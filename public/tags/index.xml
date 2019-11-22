@@ -1,49 +1,49 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Jorge López</title>
-    <link>https://jorgelopez.netlify.com/tags/</link>
+    <link>/tags/</link>
     <description>Recent content in Tags on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 04 Feb 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 13 Apr 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://jorgelopez.netlify.com/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Blogdown</title>
-      <link>https://jorgelopez.netlify.com/tags/blogdown/</link>
+      <title>gganimate</title>
+      <link>/tags/gganimate/</link>
+      <pubDate>Sat, 13 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/gganimate/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>blogdown</title>
+      <link>/tags/blogdown/</link>
       <pubDate>Mon, 04 Feb 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://jorgelopez.netlify.com/tags/blogdown/</guid>
+      <guid>/tags/blogdown/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Canarias</title>
-      <link>https://jorgelopez.netlify.com/tags/canarias/</link>
+      <link>/tags/canarias/</link>
       <pubDate>Thu, 31 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://jorgelopez.netlify.com/tags/canarias/</guid>
+      <guid>/tags/canarias/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Encuentro Usuarios</title>
-      <link>https://jorgelopez.netlify.com/tags/encuentro-usuarios/</link>
+      <title>Encuentro usuarios</title>
+      <link>/tags/encuentro-usuarios/</link>
       <pubDate>Thu, 31 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://jorgelopez.netlify.com/tags/encuentro-usuarios/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Gganimate</title>
-      <link>https://jorgelopez.netlify.com/tags/gganimate/</link>
-      <pubDate>Sat, 13 Apr 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://jorgelopez.netlify.com/tags/gganimate/</guid>
+      <guid>/tags/encuentro-usuarios/</guid>
       <description></description>
     </item>
     

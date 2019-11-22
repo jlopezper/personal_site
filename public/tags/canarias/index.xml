@@ -1,22 +1,22 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Canarias on Jorge López</title>
-    <link>https://jorgelopez.netlify.com/tags/canarias/</link>
+    <link>/tags/canarias/</link>
     <description>Recent content in Canarias on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Thu, 31 Jan 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://jorgelopez.netlify.com/tags/canarias/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/canarias/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Encuentro de usuarios R en Canarias</title>
-      <link>https://jorgelopez.netlify.com/posts/2019-01-31-encuentro-usuarios-r/</link>
+      <link>/posts/2019-01-31-encuentro-usuarios-r/</link>
       <pubDate>Thu, 31 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://jorgelopez.netlify.com/posts/2019-01-31-encuentro-usuarios-r/</guid>
+      <guid>/posts/2019-01-31-encuentro-usuarios-r/</guid>
       <description>Nada me complace más que iniciar esta nueva web y blog anunciando que el próximo 25 de marzo se llevará a cabo la primera reunión de usuarios de R –#rstats– en Canarias.
 El encuentro se realizará en la Sociedad de Promoción Económica de Gran Canaria durante todo el día y estará organizado por el también reciente grupo de usuarios de R en Canarias.
 La inscripción y propuesta de charlas (!</description>
