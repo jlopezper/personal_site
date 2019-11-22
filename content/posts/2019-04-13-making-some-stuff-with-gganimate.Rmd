@@ -25,7 +25,6 @@ library(ggplot2)
 library(gifski)
 library(gganimate)
 library(dplyr)
-
 tst <- readr::read_csv("https://elpais.com/especiales/2019/elecciones-generales/encuestas-electorales/ficheros/tabla.csv?1554807308", 
                        col_types = cols(
                          date = col_date(format = "%d/%m/%y"),
@@ -45,7 +44,6 @@ tst <- readr::read_csv("https://elpais.com/especiales/2019/elecciones-generales/
                          VOX = col_double(),
                          COM = col_double()
                        ))
-
 gga <-
   tst %>% 
   select(date, house, PP, PSOE, UP, Cs, VOX) %>% 
@@ -67,6 +65,5 @@ gga <-
   facet_wrap(~ house) +
   transition_reveal(date) + 
   shadow_mark()
-
 gganimate::animate(gga, height = 550, width = 900, nframes = 150)
 ```
