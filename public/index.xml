@@ -6,10 +6,20 @@
     <description>Recent content on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 22 Nov 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 26 Nov 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>¿Qué dice hoy la prensa? Topic modeling con R</title>
+      <link>/posts/que-dice-hoy-la-prensa-topic-modeling-con-r/</link>
+      <pubDate>Tue, 26 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/que-dice-hoy-la-prensa-topic-modeling-con-r/</guid>
+      <description>En el último post estuve jugando un poco con tidytext y algunas otras herramientas que ofrece R en cuanto a text mining se refiere. Una de las cosas que quedó pendiente fue hacer algo de topic modeling, para lo cual escribo este post. De Wikipedia:
+ In machine learning and natural language processing, a topic model is a type of statistical model for discovering the abstract “topics” that occur in a collection of documents.</description>
+    </item>
     
     <item>
       <title>Análisis de texto con R: jugando un poco con tidytext</title>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Jorge López Pérez">
+    <meta name="description" content="Personal website">
+    <meta name="keywords" content="blog,developer,personal">
+
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="¿Qué dice hoy la prensa? Topic modeling con R"/>
+<meta name="twitter:description" content="En el último post estuve jugando un poco con tidytext y algunas otras herramientas que ofrece R en cuanto a text mining se refiere. Una de las cosas que quedó pendiente fue hacer algo de topic modeling, para lo cual escribo este post. De Wikipedia:
+ In machine learning and natural language processing, a topic model is a type of statistical model for discovering the abstract “topics” that occur in a collection of documents."/>
+
+
+    <base href="/posts/que-dice-hoy-la-prensa-topic-modeling-con-r/">
+    <title>
+  ¿Qué dice hoy la prensa? Topic modeling con R · Jorge López
+</title>
+
+    <link rel="canonical" href="/posts/que-dice-hoy-la-prensa-topic-modeling-con-r/">
+
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Merriweather:300,700|Source+Code+Pro:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" integrity="sha256-oSrCnRYXvHG31SBifqP2PM1uje7SJUyX0nTwO2RJV54=" crossorigin="anonymous" />
+
+    
+      
+      
+      <link rel="stylesheet" href="/css/coder.min.ac37073bc2826cd28ef57364a9fe339de7ebcb26dafc22fd832cb35cf5b1d048.css" integrity="sha256-rDcHO8KCbNKO9XNkqf4znefryyba/CL9gyyzXPWx0Eg=" crossorigin="anonymous" media="screen" />
+    
+
+    
+
+    
+
+    
+
+    <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+    
+
+    <meta name="generator" content="Hugo 0.59.1" />
+  </head>
+
+  <body class=" ">
+    <main class="wrapper">
+      <nav class="navigation">
+  <section class="container">
+    <a class="navigation-title" href="/">
+      Jorge López
+    </a>
+    <input type="checkbox" id="menu-toggle" />
+    <label class="menu-button float-right" for="menu-toggle"><i class="fas fa-bars"></i></label>
+    <ul class="navigation-list">
+      
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/about/">About</a>
+          </li>
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/posts/">Blog</a>
+          </li>
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/projects/">Projects</a>
+          </li>
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/contact/">Contact</a>
+          </li>
+        
+      
+      
+    </ul>
+  </section>
+</nav>
+
+
+      <div class="content">
+        
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">¿Qué dice hoy la prensa? Topic modeling con R</h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fas fa-calendar"></i>
+              <time datetime='2019-11-26T00:00:00Z'>
+                November 26, 2019
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fas fa-clock"></i>
+              8 minutes read
+            </span>
+          </div>
+          <div class="categories">
+  <i class="fas fa-folder"></i>
+    <a href="/categories/rstats/">rstats</a></div>
+
+          <div class="tags">
+  <i class="fas fa-tag"></i>
+    <a href="/tags/textmining/">textmining</a></div>
+
+        </div>
+      </header>
+
+      <div>
+        
+
+
+<p>En el <a href="https://jorgelopez.netlify.com/posts/analisis-de-texto-con-r-jugando-un-poco-con-tidytext/">último post</a> estuve jugando un poco con <code>tidytext</code> y algunas otras herramientas que ofrece R en cuanto a text mining se refiere. Una de las cosas que quedó pendiente fue hacer algo de topic modeling, para lo cual escribo este post. De <a href="https://en.wikipedia.org/wiki/Topic_model">Wikipedia</a>:</p>
+<blockquote>
+<p>In machine learning and natural language processing, a topic model is a type of statistical model for discovering the abstract “topics” that occur in a collection of documents. Topic modeling is a frequently used text-mining tool for discovery of hidden semantic structures in a text body.</p>
+</blockquote>
+<p>En este caso, lo que haré será hacer <em>web scrapping</em> para obtener algunos titulares de prensa y analizarlos en R. En primer lugar, cargamos los paquetes.</p>
+<pre class="r"><code>set.seed(26)
+pkgs &lt;- c(&quot;rvest&quot;,
+          &quot;httr&quot;,
+          &quot;purrr&quot;,
+          &quot;dplyr&quot;,
+          &quot;reticulate&quot;,
+          &quot;tidytext&quot;,
+          &quot;ggplot2&quot;,
+          &quot;tidyr&quot;,
+          &quot;stringr&quot;,
+          &quot;scales&quot;,
+          &quot;BTM&quot;,
+          &quot;wordcloud&quot;,
+          &quot;reshape2&quot;,
+          &quot;topicmodels&quot;)
+
+invisible(lapply(pkgs, require, character.only = TRUE))</code></pre>
+<p>Ahora vamos a extraer la información de los titulares de tres periódicos españoles (El País, El Diario y La Razón). Lo hacemos usando la inestimable ayuda de <code>rvest</code> y <code>purrr</code>.</p>
+<pre class="r"><code># esta funcion permite leer los titulares y crear un dataframe con dos columnas (titular y periodico) 
+# en donde cada fila es un titular
+extract_info &lt;- function(url) {
+  root_site &lt;- read_html(url)
+  root_site %&gt;% 
+    html_nodes(&quot;h2&quot;) %&gt;% 
+    html_text()%&gt;% 
+    tibble::tibble(periodico = parse_url(url)$hostname, info = .)
+}
+
+noticias &lt;- map_df(c(&quot;https://elpais.com&quot;, &quot;https://eldiario.es&quot;, &quot;https://larazon.es&quot;), extract_info)</code></pre>
+<p>Ciertamente, el análisis textual está más desarrollado en inglés que en español. Y no es de <a href="https://w3techs.com/technologies/overview/content_language">extrañar</a>. Por ello, vamos a traducir los textos a inglés a través de la API de Google Translate utilizando la librería de Python <a href="https://pypi.org/project/mtranslate/"><code>mtranslate</code></a>. Para ello se va a usar <a href="https://rstudio.github.io/reticulate/"><code>reticulate</code></a>, un espectacular paquete que permite integrar código entre R y Python.</p>
+<pre class="python"><code># codigo python
+from mtranslate import translate
+noticias = r.noticias.copy()
+noticias[&#39;info_en&#39;] = noticias[&#39;info&#39;].apply(lambda x: translate(to_translate=x, from_language=&quot;es&quot;, to_language=&quot;en&quot;))</code></pre>
+<p>Volvemos a R con el mismo dataframe pero con una columna extra con la información traducida:</p>
+<pre class="r"><code>noticias &lt;- as_tibble(py$noticias)</code></pre>
+<p>A continuación vamos a tokenizar los textos en ingles, de tal modo que queda en formato <em>tidy</em> (one-token-per-row).</p>
+<pre class="r"><code>noticias_token &lt;-
+  noticias %&gt;% 
+  mutate(noticia_n = row_number()) %&gt;% 
+  unnest_tokens(word, info_en)
+
+noticias_token</code></pre>
+<pre><code>## # A tibble: 4,912 x 4
+##    periodico  info                                       noticia_n word    
+##    &lt;chr&gt;      &lt;chr&gt;                                          &lt;int&gt; &lt;chr&gt;   
+##  1 elpais.com &quot;\nERC tensa la negociación con el PSOE a…         1 erc     
+##  2 elpais.com &quot;\nERC tensa la negociación con el PSOE a…         1 tenses  
+##  3 elpais.com &quot;\nERC tensa la negociación con el PSOE a…         1 the     
+##  4 elpais.com &quot;\nERC tensa la negociación con el PSOE a…         1 negotia…
+##  5 elpais.com &quot;\nERC tensa la negociación con el PSOE a…         1 with    
+##  6 elpais.com &quot;\nERC tensa la negociación con el PSOE a…         1 the     
+##  7 elpais.com &quot;\nERC tensa la negociación con el PSOE a…         1 psoe    
+##  8 elpais.com &quot;\nERC tensa la negociación con el PSOE a…         1 by      
+##  9 elpais.com &quot;\nERC tensa la negociación con el PSOE a…         1 voting  
+## 10 elpais.com &quot;\nERC tensa la negociación con el PSOE a…         1 for     
+## # … with 4,902 more rows</code></pre>
+<p>Estas serían las palabras más repetidas en los medios analizados en el momento en el que escribo este post:</p>
+<pre class="r"><code>noticias_token %&gt;%
+  anti_join(stop_words, by = &quot;word&quot;) %&gt;% 
+  count(word, sort = TRUE) %&gt;%
+  mutate(word = reorder(word, n)) %&gt;%
+  dplyr::filter(n &gt; 5) %&gt;%
+  ggplot(aes(word, n)) +
+  ggplot2::labs(
+    y = &quot;# veces que aparece&quot;, 
+    x = &quot;Palabra&quot;,
+    title = &quot;Palabras más repetidas (&gt; 5 veces)&quot;,
+    caption = &quot;\n@jlopezper&quot;
+  ) +
+  geom_col() + 
+  coord_flip() +
+  theme_minimal()</code></pre>
+<p><img src="/posts/2019-11-25-que-dice-hoy-la-prensa-topic-modeling-con-r_files/figure-html/unnamed-chunk-7-1.png" width="960" /></p>
+<p>Y rápidamente, por no repetirnos con el post anterior, hacemos un análisis de sentimiento a utilizando el diccionario de <a href="http://sentiment.christopherpotts.net/lexicons.html#opinionlexicon">Bing Liu’s</a>. Como siempre, hay que analizarlo con cautela porque, por ejemplo, sospecho que <em>supreme</em> es la traducción literal de Tribunal Supremo.</p>
+<pre class="r"><code>noticias_token %&gt;%
+  inner_join(get_sentiments(&quot;bing&quot;), by = &quot;word&quot;) %&gt;%
+  count(word, sentiment, sort = TRUE) %&gt;%
+  acast(word ~ sentiment, value.var = &quot;n&quot;, fill = 0) %&gt;%
+  comparison.cloud(colors = c(&quot;gray20&quot;, &quot;gray80&quot;),
+                   max.words = 100)</code></pre>
+<p><img src="/posts/2019-11-25-que-dice-hoy-la-prensa-topic-modeling-con-r_files/figure-html/unnamed-chunk-8-1.png" width="960" /></p>
+<p>Finalmente, y como objetivo principal de este post, vamos a realizar algo de topic modeling para los titulares de prensa. Uno de los algoritmos más utilizados es el <a href="https://es.wikipedia.org/wiki/Latent_Dirichlet_Allocation">LDA</a>. Tal y como explican Julia Silge y David Robinson en Text Mining with R:</p>
+<blockquote>
+<p>Latent Dirichlet allocation (LDA) is a particularly popular method for fitting a topic model. It treats each document as a mixture of topics, and each topic as a mixture of words. This allows documents to “overlap” each other in terms of content, rather than being separated into discrete groups, in a way that mirrors typical use of natural language.</p>
+<p>[…]</p>
+<p>Latent Dirichlet allocation is one of the most common algorithms for topic modeling. Without diving into the math behind the model, we can understand it as being guided by two principles.</p>
+<ul>
+<li><p>Every document is a mixture of topics. We imagine that each document may contain words from several topics in particular proportions. For example, in a two-topic model we could say “Document 1 is 90% topic A and 10% topic B, while Document 2 is 30% topic A and 70% topic B.”</p></li>
+<li><p>Every topic is a mixture of words. For example, we could imagine a two-topic model of American news, with one topic for “politics” and one for “entertainment.” The most common words in the politics topic might be “President”, “Congress”, and “government”, while the entertainment topic may be made up of words such as “movies”, “television”, and “actor”. Importantly, words can be shared between topics; a word like “budget” might appear in both equally.</p></li>
+</ul>
+</blockquote>
+<p>Evidentemente, a lo que ellos se refieren como documentos son los titulares de prensa. En el libro, por ejemplo, ponen algún ejemplo donde los documentos son capítulos de libros o noticias completas de prensa. En este caso, los titulares son notablemente más cortos y por tanto veremos que se hace más complejo separar los <em>topics</em>.</p>
+<p>En primer lugar, hay que transformar los datos que tenemos. Debemos trabajar con <a href="https://en.wikipedia.org/wiki/Document-term_matrix">matrices término-documento</a>. En esta matriz:</p>
+<ul>
+<li>Cada fila representa un documento (el identificador del titular)</li>
+<li>Cada columna representa un término</li>
+<li>Cada valor contiene el número de veces que aparece ese término en ese documento.</li>
+</ul>
+<p>La información que podemos extraer cuando convertimos la información en formato <em>tidy</em> una matriz término-documento es bastante interesante. En particular, <code>Non-/sparse entries</code> hace referencia a la proporción de ceros que tenemos en la matriz (en donde <code>Sparsity</code> es el resultado de 1 menos el cociente anterior). También se puede ver que la palabra con más longitud entre todos los términos es de 20 caracteres.</p>
+<pre class="r"><code># convertimos a document-term matrix
+noticias_token_dtm &lt;- 
+  noticias_token %&gt;% 
+  anti_join(stop_words, by = &quot;word&quot;) %&gt;% 
+  count(noticia_n, word, sort = TRUE) %&gt;% 
+  cast_dtm(noticia_n, word, n)
+
+noticias_token_dtm</code></pre>
+<pre><code>## &lt;&lt;DocumentTermMatrix (documents: 439, terms: 1735)&gt;&gt;
+## Non-/sparse entries: 2582/759083
+## Sparsity           : 100%
+## Maximal term length: 20
+## Weighting          : term frequency (tf)</code></pre>
+<p>Ahora entrenamos el LDA (a modo de ejemplo, con cuatro <em>topics</em>). El modelo calcula la probabilidad de que ese término se genere a partir de ese tema. Por ejemplo, tal y como se ve en el siguiente resultado, el término <em>rights</em> parece ser generado con mayor probabilidad por el topic 3.</p>
+<pre class="r"><code># se entrena el LDA
+ap_lda &lt;- LDA(noticias_token_dtm, k = 4, control = list(seed = 26))
+
+# sacamos los betas
+ap_topics &lt;- tidy(ap_lda, matrix = &quot;beta&quot;)
+ap_topics</code></pre>
+<pre><code>## # A tibble: 6,940 x 3
+##    topic term            beta
+##    &lt;int&gt; &lt;chr&gt;          &lt;dbl&gt;
+##  1     1 rights     5.53e-241
+##  2     2 rights     1.61e-241
+##  3     3 rights     3.16e-  3
+##  4     4 rights     5.65e-241
+##  5     1 management 5.99e-  3
+##  6     2 management 6.93e- 41
+##  7     3 management 7.21e-221
+##  8     4 management 1.61e-  3
+##  9     1 nutrition  1.83e-225
+## 10     2 nutrition  3.00e-  3
+## # … with 6,930 more rows</code></pre>
+<p>Ahora bien, vamos a ver los términos más probables para cada topic. La verdad es que no se ve nada muy claro y creo que cualquier interpretación es muy aventurada.</p>
+<pre class="r"><code>ap_top_terms &lt;- ap_topics %&gt;%
+  group_by(topic) %&gt;%
+  top_n(5, beta) %&gt;%
+  ungroup() %&gt;%
+  arrange(topic, -beta)
+
+ap_top_terms %&gt;%
+  mutate(term = reorder_within(term, beta, topic)) %&gt;%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = &quot;free&quot;) +
+  coord_flip() +
+  scale_x_reordered() +
+  theme_minimal()</code></pre>
+<p><img src="/posts/2019-11-25-que-dice-hoy-la-prensa-topic-modeling-con-r_files/figure-html/unnamed-chunk-11-1.png" width="960" /></p>
+<p>Vamos a hacer un último experimento con otros datos y con otro modelo.</p>
+<ul>
+<li>Vamos a utilizar información de un periódico con información en inglés, concretamente del diario express.co.uk. Esto permite puentear el paso del traductor.</li>
+<li>En segundo lugar, vamos a cambiar la metodología. En este caso se utilizará <a href="https://github.com/bnosac/BTM">Biterm Topic Modelling (BTM)</a>, diseñado precisamente para textos cortos como los que disponemos.</li>
+</ul>
+<pre class="r"><code>extract_info &lt;- function(url) {
+  root_site &lt;- read_html(url)
+  root_site %&gt;% 
+    html_nodes(&#39;h4&#39;) %&gt;% 
+    html_text()%&gt;% 
+    tibble::tibble(periodico = parse_url(url)$hostname, info = .)
+}
+
+# extraccion de noticias
+noticias &lt;- map_df(c(&quot;https://express.co.uk/news&quot;), extract_info)</code></pre>
+<pre class="r"><code># tokenizacion
+noticias_token &lt;-
+  noticias %&gt;% 
+  mutate(documento = paste0(periodico, &quot;_&quot;, row_number())) %&gt;% 
+  unnest_tokens(word, info)</code></pre>
+<p>Entrenamos el modelo y vemos los resultados. Me parece que aquí los resultados son mejores, en donde se ven referencias a la corona británica (topic 3), de política británica (topic 4), de noticias meteorólogicas/ambientales (topic 2) y otro último topic no muy definido, en donde parece haber un batiburrillo de posibles temas (topic 1).</p>
+<pre class="r"><code>set.seed(26)
+model_btm  &lt;- BTM(noticias_token[, c(&quot;documento&quot;, &quot;word&quot;)] %&gt;% anti_join(stop_words, by = &quot;word&quot;), k = 4, beta = 0.5, iter = 1500, trace = 500)</code></pre>
+<pre><code>## 2019-11-26 23:45:33 Start Gibbs sampling iteration 1/1500
+## 2019-11-26 23:45:33 Start Gibbs sampling iteration 501/1500
+## 2019-11-26 23:45:34 Start Gibbs sampling iteration 1001/1500</code></pre>
+<pre class="r"><code>topicterms &lt;- terms(model_btm, top_n = 10)
+
+topicterms %&gt;% 
+  bind_rows(.id = &quot;topic&quot;) %&gt;% 
+  mutate(token = reorder_within(token, probability, topic)) %&gt;%
+  ggplot(aes(token, probability, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = &quot;free&quot;) +
+  coord_flip() +
+  scale_x_reordered() +
+  theme_minimal()</code></pre>
+<p><img src="/posts/2019-11-25-que-dice-hoy-la-prensa-topic-modeling-con-r_files/figure-html/unnamed-chunk-15-1.png" width="960" /></p>
+<p>En definitiva, esto solo pretende ser una aproximación un tanto <em>naive</em> a un tema que desde luego da para muchísimo.</p>
+
+      </div>
+
+      <footer>
+        <div id="disqus_thread"></div>
+<script>
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://jlopezper.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      </footer>
+    </article>
+
+    
+  </section>
+
+      </div>
+
+      <footer class="footer">
+  <section class="container">
+    
+     © 2019
+    
+       · 
+      Powered by <a href="https://gohugo.io/">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/">Coder</a>.
+    
+    
+       · 
+      [<a href="https://github.com/luizdepra/hugo-coder/tree/"></a>]
+    
+  </section>
+</footer>
+
+
+
+    </main>
+
+    
+
+  </body>
+
+</html>
