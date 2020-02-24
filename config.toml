@@ -8,7 +8,7 @@ pygmentsstyle = "b2"
 pygmentscodefences = true
 pygmentscodefencesguesssyntax = true
 disqusShortname = "jlopezper"
-
+math = true
 
 [params]
     author = "Jorge López Pérez"
