@@ -6,10 +6,21 @@
     <description>Recent content in Posts on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 26 Nov 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 23 Feb 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Modelizando resultados de partidos de fútbol: Regresión de Poisson</title>
+      <link>/posts/modelizando-resultados-de-partidos-de-f%C3%BAtbol-a-trav%C3%A9s-de-regresi%C3%B3n-de-poisson/</link>
+      <pubDate>Sun, 23 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/modelizando-resultados-de-partidos-de-f%C3%BAtbol-a-trav%C3%A9s-de-regresi%C3%B3n-de-poisson/</guid>
+      <description>Este post está plenamente inspirado en este artículo.
+ En los últimos días he estado intentando leer información sobre aplicaciones de estadística y machine learning en el campo de los deportes, concretamente en el fútbol. De mis primeras impresiones del llamado soccer/football analytics, extraigo algunas conclusiones preliminares:
+Hay mucho camino recorrido, pero queda por recorrer: es relativamente fácil encontrar todo tipo de papers y artículos relacionados con todos los subámbitos del análisis en el fútbol: predicción de resultados, rendimiento de jugadores, scouting, la familia xG y modelos de predicción de éstos, etc, aunque no he encontrado manuales/libros de referencia que cubran todo lo anterior en detalle.</description>
+    </item>
     
     <item>
       <title>¿Qué dice hoy la prensa? Topic modeling con R</title>
