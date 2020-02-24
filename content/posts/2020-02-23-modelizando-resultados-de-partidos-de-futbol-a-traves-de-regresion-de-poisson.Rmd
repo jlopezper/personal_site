@@ -1,0 +1,176 @@
+---
+title: "Modelizando resultados de partidos de fútbol: Regresión de Poisson"
+author: Jorge Lopez
+date: '2020-02-23'
+slug: modelizando-resultados-de-partidos-de-fútbol-a-través-de-regresión-de-poisson
+categories:
+  - rstats
+tags:
+  - football analytics
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=8, fig.height=5.5) 
+```
+
+
+> *Este post está plenamente inspirado en este [artículo](https://dashee87.github.io/data%20science/football/r/predicting-football-results-with-statistical-modelling/).*
+
+En los últimos días he estado intentando leer información sobre aplicaciones de estadística y machine learning en el campo de los deportes, concretamente en el fútbol. De mis primeras impresiones del llamado soccer/football analytics, extraigo algunas conclusiones preliminares:
+
+1. Hay mucho camino recorrido, pero queda por recorrer: es relativamente fácil encontrar todo tipo de papers y artículos relacionados con todos los subámbitos del análisis en el fútbol: predicción de resultados, rendimiento de jugadores, scouting, la familia xG y modelos de predicción de éstos, etc, aunque no he encontrado manuales/libros de referencia que cubran todo lo anterior en detalle.
+
+2. Todo pasa por pagar: los datos abiertos en el mundo del fútbol no están a la orden del día. Hay [cosas](https://www.jokecamp.com/blog/guide-to-football-and-soccer-data-and-apis/), sí, pero difícilmente tratables en un entorno *online*. Las principales plataformas son de pago. Desde luego, hay [gente](https://github.com/Jelagmil/soccergraphR) haciendo esfuerzos en democratizar este campo, pero en algún momento hay que pasar por caja (o buscar alternativas mediante web scrapping, lo cual no he indagado).
+
+En este post lo que voy a hacer es utilizar uno de los modelos más básicos de predicción de resultados, la [regresión de Poisson](https://es.wikipedia.org/wiki/Regresión_de_Poisson). Específicamente, lo que se modeliza es el número de goles que marcarán los equipos en un partido en concreto. La regresión de Poisson se encuadra dentro de los modelos lineales generalizados y se utiliza para modelizar datos de conteo. Cuando lo estudié en la carrera recuerdo que comentaban que una de sus primeras aplicaciones prácticas fue a finales del siglo XIX para estudiar el número de soldados prusianos muertos por coz de mulos. De esas cosas de las que uno no se olvida `r emo::ji("smile")`. 
+
+El porqué de utilizar la regresión de Poisson viene dado porque la distribución de Poisson parece muy conveniente para entender cómo se distribuyen los goles en un partido. La [distribución de Poisson](https://es.wikipedia.org/wiki/Distribución_de_Poisson) es una distribución de probabilidad discreta que describe la probabilidad de ocurrencia de un número de eventos **independientes** en un periodo de tiempo. Resalto lo de independiente porque precisamente esta es una de las debilidades que le encuentro a este modelo, ya que se antoja difícil pensar que pueda existir independencia entre goles en un partido concreto. Este modelo solo cuenta con un parámetro, $\lambda$, que corresponde a la media y varianza de la distribución. Y este es otro potencial problema del modelo de Poisson: supongamos que la media de la distribución es 1.5 goles. Este modelo asume que la varianza también es 1.5, lo cual es claramente limitante. Para corregir este hecho, una opción es optar por un modelo quasi-poisson que permite el ajuste de un parámetro de dispersión. Otra opción es ir a por otra distribución, como Binomial Negativa o Weibull.
+
+
+Pasemos al código. En primer lugar, vamos a cargar las librerías necesarias:
+
+```{r echo=TRUE, message=FALSE}
+pkgs <- c("engsoccerdata", "ggplot2", "purrr", "tidyr", "MASS", "magrittr", "AER", "dplyr")
+invisible(lapply(pkgs, require, character.only = TRUE))
+```
+
+Ahora vamos a leer, a través de la librería `engsoccerdata`, los datos de los partidos de la temporada 2016-2017 de la Primera División en España:
+
+```{r}
+df <- engsoccerdata::spain %>% 
+  as_tibble() %>% 
+  dplyr::filter(Season == 2016) %>% 
+  select(home, visitor, hgoal, vgoal)
+
+head(df)
+```
+
+
+Una cosa que podemos hacer es ver el número de goles medio por localización (local o visitante). La ventaja de jugar de local que los aficionados al fútbol dan por sentada (y que los datos indican corroborar) ha sido bien estudiada (y se puede leer sobre ella [aquí](https://en.wikipedia.org/wiki/Home_advantage)).
+
+```{r}
+df %>% 
+  summarise(`Goles local` = mean(hgoal), 
+            `Goles visitante` = mean(vgoal)) %>% 
+  pivot_longer(cols = c('Goles local', 'Goles visitante'), names_to = "tipo", values_to = "goles") %>% 
+  ggplot(aes(x = tipo, y = goles)) + geom_bar(stat="identity", width=0.5) + 
+  labs(title = "Media de goles por partido", y = "Goles", x = "Tipo") +
+  theme_minimal()
+```
+
+
+Ahora vamos a construir el dataset que alimenta a la regresión de Poisson. Lo que haremos será pasar de un formato ancho a un largo, pasando a crear una variable dummy indicando si los goles de la columna *goals* hacen referencia al equipo local o visitante. Mejor si lo vemos. Por ejemplo, para la primera fila, vemos un partido en el que el Barcelona como visitante (home = 0) marcó 5 goles al Leganés. En la tercera fila vemos el caso en el que el Málaga no marcó ningún gol a la Real Sociedad en su partido como local, etc
+
+```{r}
+df <-
+  bind_rows(
+    tibble(goals = df$hgoal,
+           team = df$home,
+           opponent = df$visitor,
+           home = 1),
+    tibble(goals = df$vgoal,
+           team = df$visitor,
+           opponent = df$home,
+           home = 0)
+  )
+
+set.seed(123)
+sample_n(df, size = 7, replace = FALSE)
+```
+
+Ahora corremos el modelo con, evidentente, el número de goles como variable dependiente y el resto como independientes:
+
+
+```{r}
+poisson_model = glm(goals ~ home + team + opponent, family=poisson(link = "log"), data = df)
+summary(poisson_model)
+```
+
+En primer lugar, se puede ver que la estimación de `home` es de ~0.26, indicando que hay un factor $\exp(0.26) \approx 1.3$ de marcar por jugar en casa, en términos medios. Sin embargo, mirando las estimaciones de los parámetros `team*` se puede ver que hay equipos mucho más goleadores que otros (destacan Madrid y Barcelona como goleadores y Granada y Leganés por "no goleadores"). Los parámetros `opponent*` vienen a indicar la dificultad de hacerle goles a un determinado equipo, en este caso valores negativos indican dificultad para marcarle goles a dicho oponente. Aquí destaca el Atlético de Madrid, y no es sorprendente, fue el equipo que menos goles encajó (27).
+
+Antes de pasar a la segunda parte del análisis, antes se comentó que uno de los problemas de este modelo podría ser la sobredispersión, que no parece ser problema en este caso:
+
+```{r}
+dispersiontest(poisson_model)
+```
+
+
+
+Ahora estamos en disposición de crear predicciones para un partido y un equipo concreto. Supongamos que queremos saber cuál es el número esperado de goles de un partido Real Sociedad - Málaga:
+
+```{r}
+home_goals_avg <- predict(poisson_model,
+                          data.frame(home=1, team="Real Sociedad", 
+                                     opponent="Malaga CF"), type="response")
+
+away_goals_avg <- predict(poisson_model, 
+                          data.frame(home=0, team="Malaga CF", 
+                                     opponent="Real Sociedad"), type="response")
+
+# Goles esperados 
+tibble("Real Sociedad" = home_goals_avg, "Málaga" = away_goals_avg)
+```
+
+Ahora veamos cual sería la probabilidad estimada de que los equipos marquen X goles:
+
+```{r}
+tst <- tibble(prob = c(dpois(0:10, home_goals_avg), dpois(0:10, away_goals_avg)), 
+              team = c(rep("Real Sociedad", 11), rep("Malaga CF", 11)),
+              index = rep(c(0:10),2))
+
+ggplot(data=tst, aes(x=as.factor(index), y=prob, color=team, group=team)) +
+  geom_line() + 
+  geom_point() +
+  labs(title = "Probabilidad estimada de marcar", x = "Goles", color = "Equipo") +
+  theme_minimal()
+
+```
+
+
+Con esto podemos calcular la probabilidad conjunta de dos eventos. Por ejemplo, la probabilidad de que la Real Sociedad marque un gol y el Málaga cero sería: $P(G = 1|Real Sociedad) \times P(G = 0|Málaga) = 0.308 \times 0.343 = 0.1056 \approx 10.6\%$. Podemos calcular una serie de resultados con la misma lógica:
+
+```{r}
+tst1 <- tibble(prob = c(dpois(0:5, home_goals_avg)), 
+               team = c(rep("Real Sociedad", 6)),
+               index = 0:5)
+
+tst2 <- tibble(prob = c(dpois(0:5, away_goals_avg)), 
+               team = c(rep("Málaga CF", 6)),
+               index = 0:5)
+
+tst3 <- merge(x = tst1, y = tst2, by = NULL) %>% 
+  mutate(prob = prob.x*prob.y)
+
+
+ggplot(tst3, aes(x = as.factor(index.x), y = as.factor(index.y), fill=prob)) +
+  geom_tile() +
+  theme_minimal() +
+  geom_text(aes(label = scales::percent(prob)), color = 'black') +
+  scale_fill_distiller(palette = "Blues", direction = +1, labels = scales::percent) +
+  labs(title = "Posibles resultados",
+       x = "Goles Real Sociedad",
+       y = "Goles Málaga")
+```
+
+
+Para este partido, la mayor probabilidad estimada se da en 1-1, aunque los resultados "colindantes" son muy similares. 
+
+Para terminar, vemos cuál sería el resultado estimado en términos de victorias (local o visitante) o empate.
+
+
+```{r}
+rs_ma <- dpois(0:10, home_goals_avg) %o% dpois(0:10, away_goals_avg)
+home_win <- sum(rs_ma[lower.tri(rs_ma)])
+away_win <- sum(rs_ma[upper.tri(rs_ma)])
+draw <- sum(diag(rs_ma))
+ 
+tibble(`Victoria local` = round(100*sum(rs_ma[lower.tri(rs_ma)]), 2),
+       `Victoria visitante` = round(100*sum(rs_ma[upper.tri(rs_ma)]), 2),
+       'Empate' = round(100*sum(diag(rs_ma)),2)) %>% 
+  pivot_longer(cols = c('Victoria local', 'Victoria visitante', 'Empate'), names_to = "res", values_to = "prob") %>% 
+  ggplot(aes(x = res, y = prob)) + geom_bar(stat="identity", width=0.5) + 
+  labs(title = "Resultado", y = "Probabilidad estimada (%)", x = "Resultado") +
+  theme_minimal()
+```
+
