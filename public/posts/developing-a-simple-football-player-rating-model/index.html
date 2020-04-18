@@ -123,8 +123,8 @@ What do I mean by rating football players?"/>
 </blockquote>
 <p>This post aims to show a simple two-step model for rating football players. To this end, I’ll take the <a href="https://es.wikipedia.org/wiki/FA_Women%27s_Super_League">FA Women’s Super League</a> as an example. The data comes from the <a href="https://github.com/statsbomb/open-data">StatsBomb Open Data repository</a>, which has all the details of the events they collect.</p>
 <p>What do I mean by rating football players? This seems a confusing term but in the end this boils down to having an objective value of the players’ performance. It’s “objective” because it’s not subject to personal views about the players at all (though, of course, the model may be biased). This performance rate ranges from 0 to 100 —meaning 0 poor performance— and it’s computed in a two-steps model. We have available the information of each event for each game, so the first step would be to have an idea on how important these events are in order to predict the match outcome. Therefore, those players who succeed in the most predominant events will have higher rating values. Thus, we have the two-steps model: the first step is to obtain the events importance and the second one is to build the rating itself throughout the weights we got in step 1.</p>
-<div id="getting-feature-weights" class="section level3">
-<h3>1. Getting feature weights</h3>
+<div id="getting-feature-importance" class="section level3">
+<h3>1. Getting feature importance</h3>
 <p>We have a lot of information about the players’ perfomance in a specific match, but we should know how important a complete pass or a tackle is. For this purpose, I’ll transform the original data (at event level) in order to have something like this:</p>
 <table style="width:100%;">
 <colgroup>
