@@ -3,37 +3,42 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>/posts/developing-a-simple-football-player-rating-model/</loc>
+    <lastmod>2020-04-16T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/categories/</loc>
-    <lastmod>2020-02-23T00:00:00+00:00</lastmod>
+    <lastmod>2020-04-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/tags/football-analytics/</loc>
-    <lastmod>2020-02-23T00:00:00+00:00</lastmod>
+    <lastmod>2020-04-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/</loc>
-    <lastmod>2020-02-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/posts/modelizando-resultados-de-partidos-de-f%C3%BAtbol-a-trav%C3%A9s-de-regresi%C3%B3n-de-poisson/</loc>
-    <lastmod>2020-02-23T00:00:00+00:00</lastmod>
+    <lastmod>2020-04-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/posts/</loc>
-    <lastmod>2020-02-23T00:00:00+00:00</lastmod>
+    <lastmod>2020-04-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/categories/rstats/</loc>
-    <lastmod>2020-02-23T00:00:00+00:00</lastmod>
+    <lastmod>2020-04-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/tags/</loc>
+    <lastmod>2020-04-16T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/modelizando-resultados-de-partidos-de-f%C3%BAtbol-a-trav%C3%A9s-de-regresi%C3%B3n-de-poisson/</loc>
     <lastmod>2020-02-23T00:00:00+00:00</lastmod>
   </url>
   

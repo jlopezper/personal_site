@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Jorge López Pérez">
+    <meta name="description" content="Personal website">
+    <meta name="keywords" content="blog,developer,personal">
+
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Building a simple football player rating model"/>
+<meta name="twitter:description" content="This model is somehow inspired by the PlayeRank methodology developed by Pappalardo et al. (2019).
+ This post aims to show a simple two-step model for rating football players. To this end, I’ll take the FA Women’s Super League as an example. The data comes from the StatsBomb Open Data repository, which has all the details of the events they collect.
+What do I mean by rating football players?"/>
+
+
+    <base href="/posts/developing-a-simple-football-player-rating-model/">
+    <title>
+  Building a simple football player rating model · Jorge López
+</title>
+
+    <link rel="canonical" href="/posts/developing-a-simple-football-player-rating-model/">
+
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Merriweather:300,700|Source+Code+Pro:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" integrity="sha256-oSrCnRYXvHG31SBifqP2PM1uje7SJUyX0nTwO2RJV54=" crossorigin="anonymous" />
+
+    
+      
+      
+      <link rel="stylesheet" href="/css/coder.min.ac37073bc2826cd28ef57364a9fe339de7ebcb26dafc22fd832cb35cf5b1d048.css" integrity="sha256-rDcHO8KCbNKO9XNkqf4znefryyba/CL9gyyzXPWx0Eg=" crossorigin="anonymous" media="screen" />
+    
+
+    
+
+    
+
+    
+
+    <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+    
+
+    <meta name="generator" content="Hugo 0.59.1" />
+  </head>
+
+  <body class=" ">
+    <main class="wrapper">
+      <nav class="navigation">
+  <section class="container">
+    <a class="navigation-title" href="/">
+      Jorge López
+    </a>
+    <input type="checkbox" id="menu-toggle" />
+    <label class="menu-button float-right" for="menu-toggle"><i class="fas fa-bars"></i></label>
+    <ul class="navigation-list">
+      
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/about/">About</a>
+          </li>
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/posts/">Blog</a>
+          </li>
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/projects/">Projects</a>
+          </li>
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/contact/">Contact</a>
+          </li>
+        
+      
+      
+    </ul>
+  </section>
+</nav>
+
+
+      <div class="content">
+        
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">Building a simple football player rating model</h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fas fa-calendar"></i>
+              <time datetime='2020-04-16T00:00:00Z'>
+                April 16, 2020
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fas fa-clock"></i>
+              5 minutes read
+            </span>
+          </div>
+          <div class="categories">
+  <i class="fas fa-folder"></i>
+    <a href="/categories/rstats/">rstats</a></div>
+
+          <div class="tags">
+  <i class="fas fa-tag"></i>
+    <a href="/tags/football-analytics/">football analytics</a></div>
+
+        </div>
+      </header>
+
+      <div>
+        
+
+
+<blockquote>
+<p>This model is somehow inspired by the <a href="https://github.com/mesosbrodleto/playerank">PlayeRank</a> methodology developed by Pappalardo et al. (2019).</p>
+</blockquote>
+<p>This post aims to show a simple two-step model for rating football players. To this end, I’ll take the <a href="https://es.wikipedia.org/wiki/FA_Women%27s_Super_League">FA Women’s Super League</a> as an example. The data comes from the <a href="https://github.com/statsbomb/open-data">StatsBomb Open Data repository</a>, which has all the details of the events they collect.</p>
+<p>What do I mean by rating football players? This seems a confusing term but in the end this boils down to having an objective value of the players’ performance. It’s “objective” because it’s not subject to personal views about the players at all (though, of course, the model may be biased). This performance rate ranges from 0 to 100 —meaning 0 poor performance— and it’s computed in a two-steps model. We have available the information of each event for each game, so the first step would be to have an idea on how important these events are in order to predict the match outcome. Therefore, those players who succeed in the most predominant events will have higher rating values. Thus, we have the two-steps model: the first step is to obtain the events importance and the second one is to build the rating itself throughout the weights we got in step 1.</p>
+<div id="getting-feature-weights" class="section level3">
+<h3>1. Getting feature weights</h3>
+<p>We have a lot of information about the players’ perfomance in a specific match, but we should know how important a complete pass or a tackle is. For this purpose, I’ll transform the original data (at event level) in order to have something like this:</p>
+<table style="width:100%;">
+<colgroup>
+<col width="9%" />
+<col width="11%" />
+<col width="11%" />
+<col width="10%" />
+<col width="7%" />
+<col width="16%" />
+<col width="17%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>match_id</th>
+<th>home_score</th>
+<th>away_score</th>
+<th>team_type</th>
+<th>result</th>
+<th>complete_passes</th>
+<th>incomplete_passes</th>
+<th>other_variables</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>19714</td>
+<td>0</td>
+<td>1</td>
+<td>home_team</td>
+<td>0</td>
+<td>382</td>
+<td>150</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td>19714</td>
+<td>0</td>
+<td>1</td>
+<td>away_team</td>
+<td>1</td>
+<td>420</td>
+<td>201</td>
+<td>…</td>
+</tr>
+<tr class="odd">
+<td>19715</td>
+<td>3</td>
+<td>1</td>
+<td>home_team</td>
+<td>1</td>
+<td>560</td>
+<td>198</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td>19715</td>
+<td>3</td>
+<td>1</td>
+<td>away_team</td>
+<td>0</td>
+<td>364</td>
+<td>269</td>
+<td>…</td>
+</tr>
+<tr class="odd">
+<td>19716</td>
+<td>0</td>
+<td>0</td>
+<td>home_team</td>
+<td>0</td>
+<td>459</td>
+<td>256</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td>19716</td>
+<td>0</td>
+<td>0</td>
+<td>away_team</td>
+<td>0</td>
+<td>474</td>
+<td>321</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
+<p>For each match, I’ll have two records, one for each team. Then, the target (<code>result</code> column) is defined by the match outcome so it’s set to 1 in case of win and 0 in case of defeat or draw. This is of course a simplification in order to deal with a binary outcome and it works reasonably well. For the whole dataset there’re 923 defeats or draws and 675 wins. To train this model, I’ll use all the <a href="https://github.com/statsbomb/open-data/blob/master/data/competitions.json">competitions and matches</a> available in the StatsBombs repository, though I’ll only compute the FA Women’s League’s rating values afterwards, as I said.</p>
+<p>I’ll try with three different models: a Logistic Regression, a Support Vector Machine with Linear Kernel and a Support Vector Machine with Radial Basis Kernel. These are the results after tuning some hyperparameter values of the SVM models (using a 10-fold cross-validation):</p>
+<p><img src="/posts/2020-04-16-developing-a-simple-football-player-rating-model_files/models_evaluation.png" /></p>
+<p>According to the results, I’ll select the SVM with Radial Kernel as the final model since it’s the one with the highest AUC value, though it’d be desirable to compare the significance of the AUCs’ differences through, for example, a permutation test.</p>
+<p>Now, let’s see what the coefficients look like. Overall, it seems to be pretty consistent with what one might expect though there’re some variables which have the opposite sign I’d expect (like <code>red_card</code>) but I think this is an ocurrence issue, red cards aren’t a common events during a game and I suspect they almost always occur at the end of the matches, so this may not affect the outcome of the matches as one might expect. This is definitely something that needs to be looked at more closely. The other variable that caught my attention is <code>goalkeeper_saves</code>. At first glance, I thought this should have a positive impact on wins, but after further thought I realised that the more the goalkeeper is saving, the more offensive action the opponent is taking (and therefore the greater its chances of winning).</p>
+<p><img src="/posts/2020-04-16-developing-a-simple-football-player-rating-model_files/variables_weight.png" /></p>
+<p>The resulting coefficients are the weights I’ll use for the second step.</p>
+</div>
+<div id="player-rating" class="section level3">
+<h3>2. Player Rating</h3>
+<p>In this second phase, I’ll use the coefficients to build the rating metric, which I’ll denote by <span class="math inline">\(r_i\)</span> where <span class="math inline">\(i = \{player_1, player_2,..., player_n\}\)</span>. Now the goal is to build the same dataset as before but at player and match level. This will allow us to have the same variables with which we built the previous model. Once I have the dataset, I proceed as follows:</p>
+<ol style="list-style-type: decimal">
+<li>I multiply each feature by its weight —coefficients of the SVM model— at game and player level.</li>
+<li>I add up all these weighted variables obtaining a value in the range <span class="math inline">\([0, \infty)\)</span>. Take into account that resulting values are already weighted by the minutes the players have played in that specific game!</li>
+<li>Then I normalize and multiply them by 100, so they’re bounded in the range <span class="math inline">\([0, 100]\)</span>.</li>
+<li>Finally, I compute the mean for each player.</li>
+</ol>
+<p>Let’s see the rating distribution for each position:</p>
+<p><img src="/posts/2020-04-16-developing-a-simple-football-player-rating-model_files/ridges_perfomance_rating.png" /></p>
+<p>Let’s also take a look at the players with the highest rating. If anyone knows this league closely, let me know if these results seem reasonable!</p>
+<p><img src="/posts/2020-04-16-developing-a-simple-football-player-rating-model_files/perfomance_rating.png" /></p>
+<p>One last interesting thing we can see is the rating evolution over time.</p>
+<p><img src="/posts/2020-04-16-developing-a-simple-football-player-rating-model_files/rating_season_position.png" /></p>
+</div>
+<div id="caveats-and-conclusions" class="section level3">
+<h3>Caveats and conclusions</h3>
+<p>This isn’t a perfect model and it doesn’t pretend to be either. Actually, what I find most interesting about the analysis is that with a relatively simple model you can get results that might be reasonable.</p>
+<p>Some additional notes:</p>
+<ul>
+<li>Besides improving the model itself by including more variables or improving existing ones, I might consider training one model for each position instead of having only one.</li>
+<li>I’d be pretty skeptical of the goalkeepers’ results since their perfomance shouldn’t be measure in the same way as other players.</li>
+<li>Of course I’m not entirely comfortable with the way of building the <span class="math inline">\(r_i\)</span> values. I’d probably look for a more sophisticated method.</li>
+<li>I’ve considered the players’ position as the way of comparing the performance within roles but this may not be the right way. PlayeRank goes one step further and compute the players’ roles via an affinity clustering.</li>
+</ul>
+</div>
+
+      </div>
+
+      <footer>
+        <div id="disqus_thread"></div>
+<script>
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://jlopezper.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      </footer>
+    </article>
+
+    
+  </section>
+
+      </div>
+
+      <footer class="footer">
+  <section class="container">
+    
+     © 2020
+    
+       · 
+      Powered by <a href="https://gohugo.io/">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/">Coder</a>.
+    
+    
+       · 
+      [<a href="https://github.com/luizdepra/hugo-coder/tree/"></a>]
+    
+  </section>
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+  });
+  MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+
+  MathJax.Hub.Config({
+  
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+  });
+</script> 
+</footer>
+
+
+
+    </main>
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-163611522-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+
+  </body>
+
+</html>

@@ -6,10 +6,21 @@
     <description>Recent content in football analytics on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 23 Feb 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 16 Apr 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/football-analytics/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Building a simple football player rating model</title>
+      <link>/posts/developing-a-simple-football-player-rating-model/</link>
+      <pubDate>Thu, 16 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/developing-a-simple-football-player-rating-model/</guid>
+      <description>This model is somehow inspired by the PlayeRank methodology developed by Pappalardo et al. (2019).
+ This post aims to show a simple two-step model for rating football players. To this end, I’ll take the FA Women’s Super League as an example. The data comes from the StatsBomb Open Data repository, which has all the details of the events they collect.
+What do I mean by rating football players?</description>
+    </item>
     
     <item>
       <title>Modelizando resultados de partidos de fútbol: Regresión de Poisson</title>

@@ -1,0 +1,142 @@
+---
+title: Building a simple football player rating model
+author: Jorge Lopez
+date: '2020-04-16'
+slug: developing-a-simple-football-player-rating-model
+categories:
+  - rstats
+tags:
+  - football analytics
+---
+
+
+
+<blockquote>
+<p>This model is somehow inspired by the <a href="https://github.com/mesosbrodleto/playerank">PlayeRank</a> methodology developed by Pappalardo et al. (2019).</p>
+</blockquote>
+<p>This post aims to show a simple two-step model for rating football players. To this end, I’ll take the <a href="https://es.wikipedia.org/wiki/FA_Women%27s_Super_League">FA Women’s Super League</a> as an example. The data comes from the <a href="https://github.com/statsbomb/open-data">StatsBomb Open Data repository</a>, which has all the details of the events they collect.</p>
+<p>What do I mean by rating football players? This seems a confusing term but in the end this boils down to having an objective value of the players’ performance. It’s “objective” because it’s not subject to personal views about the players at all (though, of course, the model may be biased). This performance rate ranges from 0 to 100 —meaning 0 poor performance— and it’s computed in a two-steps model. We have available the information of each event for each game, so the first step would be to have an idea on how important these events are in order to predict the match outcome. Therefore, those players who succeed in the most predominant events will have higher rating values. Thus, we have the two-steps model: the first step is to obtain the events importance and the second one is to build the rating itself throughout the weights we got in step 1.</p>
+<div id="getting-feature-weights" class="section level3">
+<h3>1. Getting feature weights</h3>
+<p>We have a lot of information about the players’ perfomance in a specific match, but we should know how important a complete pass or a tackle is. For this purpose, I’ll transform the original data (at event level) in order to have something like this:</p>
+<table style="width:100%;">
+<colgroup>
+<col width="9%" />
+<col width="11%" />
+<col width="11%" />
+<col width="10%" />
+<col width="7%" />
+<col width="16%" />
+<col width="17%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>match_id</th>
+<th>home_score</th>
+<th>away_score</th>
+<th>team_type</th>
+<th>result</th>
+<th>complete_passes</th>
+<th>incomplete_passes</th>
+<th>other_variables</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>19714</td>
+<td>0</td>
+<td>1</td>
+<td>home_team</td>
+<td>0</td>
+<td>382</td>
+<td>150</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td>19714</td>
+<td>0</td>
+<td>1</td>
+<td>away_team</td>
+<td>1</td>
+<td>420</td>
+<td>201</td>
+<td>…</td>
+</tr>
+<tr class="odd">
+<td>19715</td>
+<td>3</td>
+<td>1</td>
+<td>home_team</td>
+<td>1</td>
+<td>560</td>
+<td>198</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td>19715</td>
+<td>3</td>
+<td>1</td>
+<td>away_team</td>
+<td>0</td>
+<td>364</td>
+<td>269</td>
+<td>…</td>
+</tr>
+<tr class="odd">
+<td>19716</td>
+<td>0</td>
+<td>0</td>
+<td>home_team</td>
+<td>0</td>
+<td>459</td>
+<td>256</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td>19716</td>
+<td>0</td>
+<td>0</td>
+<td>away_team</td>
+<td>0</td>
+<td>474</td>
+<td>321</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
+<p>For each match, I’ll have two records, one for each team. Then, the target (<code>result</code> column) is defined by the match outcome so it’s set to 1 in case of win and 0 in case of defeat or draw. This is of course a simplification in order to deal with a binary outcome and it works reasonably well. For the whole dataset there’re 923 defeats or draws and 675 wins. To train this model, I’ll use all the <a href="https://github.com/statsbomb/open-data/blob/master/data/competitions.json">competitions and matches</a> available in the StatsBombs repository, though I’ll only compute the FA Women’s League’s rating values afterwards, as I said.</p>
+<p>I’ll try with three different models: a Logistic Regression, a Support Vector Machine with Linear Kernel and a Support Vector Machine with Radial Basis Kernel. These are the results after tuning some hyperparameter values of the SVM models (using a 10-fold cross-validation):</p>
+<p><img src="/posts/2020-04-16-developing-a-simple-football-player-rating-model_files/models_evaluation.png" /></p>
+<p>According to the results, I’ll select the SVM with Radial Kernel as the final model since it’s the one with the highest AUC value, though it’d be desirable to compare the significance of the AUCs’ differences through, for example, a permutation test.</p>
+<p>Now, let’s see what the coefficients look like. Overall, it seems to be pretty consistent with what one might expect though there’re some variables which have the opposite sign I’d expect (like <code>red_card</code>) but I think this is an ocurrence issue, red cards aren’t a common events during a game and I suspect they almost always occur at the end of the matches, so this may not affect the outcome of the matches as one might expect. This is definitely something that needs to be looked at more closely. The other variable that caught my attention is <code>goalkeeper_saves</code>. At first glance, I thought this should have a positive impact on wins, but after further thought I realised that the more the goalkeeper is saving, the more offensive action the opponent is taking (and therefore the greater its chances of winning).</p>
+<p><img src="/posts/2020-04-16-developing-a-simple-football-player-rating-model_files/variables_weight.png" /></p>
+<p>The resulting coefficients are the weights I’ll use for the second step.</p>
+</div>
+<div id="player-rating" class="section level3">
+<h3>2. Player Rating</h3>
+<p>In this second phase, I’ll use the coefficients to build the rating metric, which I’ll denote by <span class="math inline">\(r_i\)</span> where <span class="math inline">\(i = \{player_1, player_2,..., player_n\}\)</span>. Now the goal is to build the same dataset as before but at player and match level. This will allow us to have the same variables with which we built the previous model. Once I have the dataset, I proceed as follows:</p>
+<ol style="list-style-type: decimal">
+<li>I multiply each feature by its weight —coefficients of the SVM model— at game and player level.</li>
+<li>I add up all these weighted variables obtaining a value in the range <span class="math inline">\([0, \infty)\)</span>. Take into account that resulting values are already weighted by the minutes the players have played in that specific game!</li>
+<li>Then I normalize and multiply them by 100, so they’re bounded in the range <span class="math inline">\([0, 100]\)</span>.</li>
+<li>Finally, I compute the mean for each player.</li>
+</ol>
+<p>Let’s see the rating distribution for each position:</p>
+<p><img src="/posts/2020-04-16-developing-a-simple-football-player-rating-model_files/ridges_perfomance_rating.png" /></p>
+<p>Let’s also take a look at the players with the highest rating. If anyone knows this league closely, let me know if these results seem reasonable!</p>
+<p><img src="/posts/2020-04-16-developing-a-simple-football-player-rating-model_files/perfomance_rating.png" /></p>
+<p>One last interesting thing we can see is the rating evolution over time.</p>
+<p><img src="/posts/2020-04-16-developing-a-simple-football-player-rating-model_files/rating_season_position.png" /></p>
+</div>
+<div id="caveats-and-conclusions" class="section level3">
+<h3>Caveats and conclusions</h3>
+<p>This isn’t a perfect model and it doesn’t pretend to be either. Actually, what I find most interesting about the analysis is that with a relatively simple model you can get results that might be reasonable.</p>
+<p>Some additional notes:</p>
+<ul>
+<li>Besides improving the model itself by including more variables or improving existing ones, I might consider training one model for each position instead of having only one.</li>
+<li>I’d be pretty skeptical of the goalkeepers’ results since their perfomance shouldn’t be measure in the same way as other players.</li>
+<li>Of course I’m not entirely comfortable with the way of building the <span class="math inline">\(r_i\)</span> values. I’d probably look for a more sophisticated method.</li>
+<li>I’ve considered the players’ position as the way of comparing the performance within roles but this may not be the right way. PlayeRank goes one step further and compute the players’ roles via an affinity clustering.</li>
+</ul>
+</div>
