@@ -99,7 +99,7 @@ Una de las cosas que me interesaba comprobar es cuán fácil es replicar algunos
             </span>
             <span class="reading-time">
               <i class="fas fa-clock"></i>
-              5 minutes read
+              6 minutes read
             </span>
           </div>
           <div class="categories">
@@ -174,18 +174,18 @@ rt_all &lt;- bind_rows(rt, rt_net)</code></pre>
 # este seria el resultado
 sample_n(tidy_rt, 10)</code></pre>
 <pre><code>## # A tibble: 10 x 3
-##    created_at          screen_name     word      
-##    &lt;dttm&gt;              &lt;chr&gt;           &lt;chr&gt;     
-##  1 2019-11-14 08:46:09 udlaspalmasNET  ciudad    
-##  2 2019-11-18 23:52:13 scorelawn       división  
-##  3 2019-11-21 15:18:24 udlaspalmasNET  afición   
-##  4 2019-11-17 12:27:32 FTerceraCanaria siguiente 
-##  5 2019-11-17 13:23:13 Javier_Marrero  palmas    
-##  6 2019-11-19 15:43:41 vwcanarias      describe  
-##  7 2019-11-22 09:41:46 _JavierAmador   carnavales
-##  8 2019-11-17 17:11:02 canarias7       ud        
-##  9 2019-11-22 14:07:03 Deportes_lp     histórico 
-## 10 2019-11-18 05:56:49 CanariasYUDLP   ud</code></pre>
+##    created_at          screen_name    word          
+##    &lt;dttm&gt;              &lt;chr&gt;          &lt;chr&gt;         
+##  1 2020-04-16 13:02:32 ramirez_perera erauncrass    
+##  2 2020-04-17 09:46:10 lucasbravode   mejores       
+##  3 2020-04-12 10:54:44 Jose1073r1     udlp_oficial  
+##  4 2020-04-12 15:10:26 RuymanAlmeidaP todogolesradio
+##  5 2020-04-12 15:55:16 marriaga1974   hace          
+##  6 2020-04-13 08:03:27 PERICOSAFE     memoriaudlp   
+##  7 2020-04-17 16:07:19 TDCdeportes    entrega       
+##  8 2020-04-11 06:33:56 kaskai19       sabian        
+##  9 2020-04-17 20:55:15 BattaAlex      acuerdo       
+## 10 2020-04-11 07:54:20 icocoru        eofutbol</code></pre>
 <p>Una pregunta natural: ¿cuáles son las palabras más frecuentes?</p>
 <pre class="r"><code>tidy_rt %&gt;%
   count(word, sort = TRUE) %&gt;%
@@ -218,6 +218,22 @@ sample_n(tidy_rt, 10)</code></pre>
                             random.order = FALSE,
                             rot.per = 0.3,
                             colors = brewer.pal(8,&quot;Dark2&quot;)))</code></pre>
+<pre><code>## Warning in wordcloud::wordcloud(words = word, freq = n, max.words = 300, :
+## udlp_fundacion could not be fit on page. It will not be plotted.</code></pre>
+<pre><code>## Warning in wordcloud::wordcloud(words = word, freq = n, max.words = 300, :
+## wakasobobby could not be fit on page. It will not be plotted.</code></pre>
+<pre><code>## Warning in wordcloud::wordcloud(words = word, freq = n, max.words = 300, :
+## esports_udlp could not be fit on page. It will not be plotted.</code></pre>
+<pre><code>## Warning in wordcloud::wordcloud(words = word, freq = n, max.words = 300, :
+## pericosafe could not be fit on page. It will not be plotted.</code></pre>
+<pre><code>## Warning in wordcloud::wordcloud(words = word, freq = n, max.words = 300, :
+## aarondogoro could not be fit on page. It will not be plotted.</code></pre>
+<pre><code>## Warning in wordcloud::wordcloud(words = word, freq = n, max.words = 300, :
+## jugadores could not be fit on page. It will not be plotted.</code></pre>
+<pre><code>## Warning in wordcloud::wordcloud(words = word, freq = n, max.words = 300, :
+## tanadp_24 could not be fit on page. It will not be plotted.</code></pre>
+<pre><code>## Warning in wordcloud::wordcloud(words = word, freq = n, max.words = 300, :
+## ultranaciente could not be fit on page. It will not be plotted.</code></pre>
 <p><img src="/posts/2019-11-22-analisis-de-texto-con-r-jugando-un-poco-con-tidytext_files/figure-html/fig1-1.png" width="576" /></p>
 <p>Ahora vamos con algo de análisis de sentimiento. Para ello, tomamos el siguiente <a href="https://www.kaggle.com/rtatman/sentiment-lexicons-for-81-languages/version/1">diccionario de sentimientos</a>. En honor a la verdad, no está muy pulido y he visto errores que he corregido sobre la marcha, pero vale para una primera intentona.</p>
 <pre class="r"><code>positive_words &lt;-

@@ -295,9 +295,9 @@ noticias_token &lt;-
 <p>Entrenamos el modelo y vemos los resultados. Me parece que aquí los resultados son mejores, en donde se ven referencias a la corona británica (topic 3), de política británica (topic 4), de noticias meteorólogicas/ambientales (topic 2) y otro último topic no muy definido, en donde parece haber un batiburrillo de posibles temas (topic 1).</p>
 <pre class="r"><code>set.seed(26)
 model_btm  &lt;- BTM(noticias_token[, c(&quot;documento&quot;, &quot;word&quot;)] %&gt;% anti_join(stop_words, by = &quot;word&quot;), k = 4, beta = 0.5, iter = 1500, trace = 500)</code></pre>
-<pre><code>## 2019-11-26 23:45:33 Start Gibbs sampling iteration 1/1500
-## 2019-11-26 23:45:33 Start Gibbs sampling iteration 501/1500
-## 2019-11-26 23:45:34 Start Gibbs sampling iteration 1001/1500</code></pre>
+<pre><code>## 2020-04-18 20:53:37 Start Gibbs sampling iteration 1/1500
+## 2020-04-18 20:53:38 Start Gibbs sampling iteration 501/1500
+## 2020-04-18 20:53:38 Start Gibbs sampling iteration 1001/1500</code></pre>
 <pre class="r"><code>topicterms &lt;- terms(model_btm, top_n = 10)
 
 topicterms %&gt;% 
