@@ -11,9 +11,8 @@
 
     <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Building a simple football player rating model"/>
-<meta name="twitter:description" content="This model is somehow inspired by the PlayeRank methodology developed by Pappalardo et al. (2019).
- This post aims to show a simple two-step model for rating football players. To this end, I’ll take the FA Women’s Super League as an example. The data comes from the StatsBomb Open Data repository, which has all the details of the events they collect.
-What do I mean by rating football players?"/>
+<meta name="twitter:description" content="This model is somehow inspired by the PlayeRank methodology developed by Pappalardo et al. (2019). You can see the work-in-progress code of the following analysis here.
+ This post aims to show a simple two-step model for rating football players. To this end, I’ll take the FA Women’s Super League as an example. The data comes from the StatsBomb Open Data repository, which has all the details of the events they collect."/>
 
 
     <base href="/posts/developing-a-simple-football-player-rating-model/">
@@ -119,7 +118,7 @@ What do I mean by rating football players?"/>
 
 
 <blockquote>
-<p>This model is somehow inspired by the <a href="https://github.com/mesosbrodleto/playerank">PlayeRank</a> methodology developed by Pappalardo et al. (2019).</p>
+<p>This model is somehow inspired by the <a href="https://github.com/mesosbrodleto/playerank">PlayeRank</a> methodology developed by Pappalardo et al. (2019). You can see the work-in-progress code of the following analysis <a href="https://github.com/jlopezper/player-perfomance-model">here</a>.</p>
 </blockquote>
 <p>This post aims to show a simple two-step model for rating football players. To this end, I’ll take the <a href="https://es.wikipedia.org/wiki/FA_Women%27s_Super_League">FA Women’s Super League</a> as an example. The data comes from the <a href="https://github.com/statsbomb/open-data">StatsBomb Open Data repository</a>, which has all the details of the events they collect.</p>
 <p>What do I mean by rating football players? This seems a confusing term but in the end this boils down to having an objective value of the players’ performance. It’s “objective” because it’s not subject to personal views about the players at all (though, of course, the model may be biased). This performance rate ranges from 0 to 100 —meaning 0 poor performance— and it’s computed in a two-steps model. We have available the information of each event for each game, so the first step would be to have an idea on how important these events are in order to predict the match outcome. Therefore, those players who succeed in the most predominant events will have higher rating values. Thus, we have the two-steps model: the first step is to obtain the events importance and the second one is to build the rating itself throughout the weights we got in step 1.</p>

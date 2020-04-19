@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.width=8, fig.height=5.5) 
 ```
 
-> This model is somehow inspired by the [PlayeRank](https://github.com/mesosbrodleto/playerank) methodology developed by Pappalardo et al. (2019).
+> This model is somehow inspired by the [PlayeRank](https://github.com/mesosbrodleto/playerank) methodology developed by Pappalardo et al. (2019). You can see the work-in-progress code of the following analysis [here](https://github.com/jlopezper/player-perfomance-model).
 
 This post aims to show a simple two-step model for rating football players. To this end, I'll take the [FA Women's Super League](https://es.wikipedia.org/wiki/FA_Women%27s_Super_League) as an example. The data comes from the [StatsBomb Open Data repository](https://github.com/statsbomb/open-data), which has all the details of the events they collect.
 
