@@ -7,13 +7,14 @@ categories:
   - rstats
 tags:
   - bayesian
+header-includes:
+  - \usepackage{amsmath}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.width=8, fig.height=5.5) 
 ```
-
 
 Una de las cosas más atractivas de la inferencia bayesiana es que permite la incorporación de conocimiento previo o creencias mediante distribuciones de probabilidad sobre los parámetros de interés. Por ejemplo, uno querría estimar cuál es la tasa de letalidad de una enfermedad y querría incorporar la información de un estudio previo, que indica que es del 0.5%. Esto confronta con la escuela frecuentista de la estadística, que asume que las probabilidades están estrictamente relacionadas con la frecuencia de los eventos. Para los frecuentistas, el valor real de este parámetro (por ej, la tasa de letalidad) es fijo y desconocido y, por tanto, no tiene sentido establecer ninguna distribución de probabilidad sobre él.
 
@@ -25,9 +26,13 @@ Para muchos, sin embargo, es más natural preguntarse: ¿cuál es la probabilida
 
 La estadística bayesiana, se basa en el Teorema de Bayes:
 
-$$P(\theta | x) = \frac{P(x|\theta)P(\theta)}{P(x)}$$
+<center>
+$P(\theta | x) = \frac{P(x|\theta)P(\theta)}{P(x)}$
+</center>
 
+<center>
 $P(\theta | x) = \frac{P(x|\theta)P(\theta)}{\int_{\theta}{}P(x,\theta)d\theta}$
+</center>
 
 En donde $P(\theta | x)$ es la probabilidad a posteriori del parámetro dados los datos $x$ (esto es lo que queremos estimar), $P(x|\theta)$ es la función de verosimilitud e indica la probabilidad de observar $x$ dado $\theta$ y $P(\theta)$ refleja la creencia a priori sobre nuestro parámetro $\theta$. El denominador, que en la versión discreta sería $P(x) = \sum_{\theta}P(x,\theta)$ (se le suele denominar la *evidencia*), es precisamente el elemento que complica el cálculo de la ecuación. La integral que se ve en la fórmula puede complicarse de tal forma que hace muy difícil su cálculo de manera analítica. Aquí es donde entran en juego los métodos numéricos como [**Markov Chain Monte Carlo**](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) (MCMC). Dentro de los MCMC, hay diversos métodos, pero aquí el que voy a tratar es el algoritmo [**Metropolis-Hastings**](https://en.wikipedia.org/wiki/Metropolis–Hastings_algorithm). 
 
@@ -35,9 +40,13 @@ Veamos un ejemplo concreto:
 
 En primer lugar, simulemos algunos datos. En concreto, 50 valores de una distribución de Poisson con media 5. 
 
+<center>
 $X \sim  Poi(\lambda = 5)$
+</center>
 
+<center>
 $p(x|\lambda) = \frac{e^{-\lambda}\lambda^{x}}{x!}$
+</center>
 
 ```{r}
 df <- rpois(n = 50, lambda = 5)
@@ -47,12 +56,15 @@ barplot(table(df), main = 'Data distribution', ylab = 'Count', space = 0.2)
 
 El segundo paso es definir el modelo, que en este caso, como hemos generado los datos bajo una Poisson, la verosimilitud también será una Poisson con parámetro $\lambda$. Por último, tenemos que fijar una distribución a priori para nuestro parámetro $\lambda$ de interés. En este caso, nuestra distribución a priori será una Gamma con parámetros de forma $\alpha$ (*shape*) y $\beta$ (*rate*) tal que su función de densidad:
 
+<center>
 $g(\lambda; \alpha, \beta) = \frac{\beta^{\alpha}\lambda^{\alpha-1}e^{-\lambda\beta}}{\Gamma (\alpha)} \propto \lambda^{\alpha-1}e^{-\lambda\beta}$
-
+</center>
 
 Para analizar este modelo de forma analítica es conveniente que la distribución a priori sea una Gamma, ya que la distribución a priori Gamma para $\lambda$ es conjugada (las distribuciones a priori y posteriori coinciden), es decir, que nuestra distribución a posteriori también será una Gamma. Los parámetros de esta distribución Gamma a posteriori son:
 
+<center>
 $\lambda|X \sim G(\alpha + \sum X_i , \beta + n)$
+</center>
 
 Esta distribución a posteriori se ha podido calcular de forma analítica porque las distribuciones a priori y posteriori son conjugadas, pero esto no siempre es el caso, de ahí que se requiera de métodos numéricos que solucionen este problema.
 
@@ -66,7 +78,9 @@ El funcionamiento del algoritmo es el siguiente:
 3. Calculamos la verosimilitud para el valor actual y propuesto de $\lambda$, tal que $L(\lambda|X_1..X_n)=\prod_{i=1}^{N}\frac{e^{-\lambda}\lambda^{x_i}}{X_i!}$
 4. Calculamos las probabilidades a posteriori como el producto entre la verosimilitud y la distribución a priori. Después, calculamos el ratio de aceptación, que se obtiene al dividir las probabilidades a posteriori del lambda propupuesto $(\lambda_p)$ y el lambda actual $(\lambda_a)$, consiguiendo así cancelar la evidencia, $P(x)$, que es el término del que precisamente queríamos deshacernos:
 
+<center>
 $\frac{P(\lambda_p | x)}{P(\lambda_a | x)}\frac{\frac{P(x|\lambda_p)P(\lambda_p)}{P(x)}}{\frac{P(x|\lambda_a)P(\lambda_a)}{P(x)}} = \frac{P(x|\lambda_p)P(\lambda_p)}{P(x|\lambda_a)P(\lambda_a)}$
+</center>
 
 5. Si este ratio es mayor a un valor aleatorio entre 0 y 1, aceptamos la propuesta y tomamos $\lambda_a = \lambda_p$. En caso contrario, mantenemos el valor actual, $\lambda_a$. La lógica es la siguiente, a través del ratio de aceptación lo que estamos consiguiendo es que estamos recorriendo con mayor frecuencia las regiones con mayor probabilidad a posteriori en detrimento de oras con menor probabilidad.
 6. Repetimos $N$ veces.
