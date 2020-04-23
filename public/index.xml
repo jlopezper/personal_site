@@ -13,10 +13,10 @@
     
     <item>
       <title>Entendiendo los métodos Markov Chain Monte Carlo</title>
-      <link>/posts/entendiendo-los-m%C3%A9todos-de-cadenas-de-markov-monte-carlo/</link>
+      <link>/posts/entendiendo-los-metodos-de-cadenas-de-markov-monte-carlo/</link>
       <pubDate>Wed, 22 Apr 2020 00:00:00 +0000</pubDate>
       
-      <guid>/posts/entendiendo-los-m%C3%A9todos-de-cadenas-de-markov-monte-carlo/</guid>
+      <guid>/posts/entendiendo-los-metodos-de-cadenas-de-markov-monte-carlo/</guid>
       <description>Una de las cosas más atractivas de la inferencia bayesiana es que permite la incorporación de conocimiento previo o creencias mediante distribuciones de probabilidad sobre los parámetros de interés. Por ejemplo, uno querría estimar cuál es la tasa de letalidad de una enfermedad y querría incorporar la información de un estudio previo, que indica que es del 0.5%. Esto confronta con la escuela frecuentista de la estadística, que asume que las probabilidades están estrictamente relacionadas con la frecuencia de los eventos.</description>
     </item>
     
