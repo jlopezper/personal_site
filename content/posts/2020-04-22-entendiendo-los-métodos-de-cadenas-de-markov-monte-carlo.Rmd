@@ -23,11 +23,7 @@ Para muchos, sin embargo, es más natural preguntarse: ¿cuál es la probabilida
 
 La estadística bayesiana, se basa en el Teorema de Bayes:
 
-
-
-$$
-P(\theta | x) = \frac{P(x|\theta)P(\theta)}{P(x)}
-$$
+$$P(\theta | x) = \frac{P(x|\theta)P(\theta)}{P(x)}$$
 
 $P(\theta | x) = \frac{P(x|\theta)P(\theta)}{\int_{\theta}{}P(x,\theta)d\theta}$
 
