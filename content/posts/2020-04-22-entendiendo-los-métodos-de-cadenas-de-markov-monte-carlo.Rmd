@@ -3,8 +3,10 @@ title: "Entendiendo los métodos Markov Chain Monte Carlo"
 author: "Jorge Lopez"
 date: '2020-04-22'
 slug: entendiendo-los-métodos-de-cadenas-de-markov-monte-carlo
-tags: bayesian
-categories: rstats
+categories:
+  - rstats
+tags:
+  - bayesian
 ---
 
 ```{r setup, include=FALSE}
