@@ -25,7 +25,8 @@ Para muchos, sin embargo, es más natural preguntarse: ¿cuál es la probabilida
 
 La estadística bayesiana, se basa en el Teorema de Bayes:
 
-$P(\theta | x) = \frac{P(x|\theta)P(\theta)}{P(x)}$
+$$P(\theta | x) = \frac{P(x|\theta)P(\theta)}{P(x)}$$
+
 $P(\theta | x) = \frac{P(x|\theta)P(\theta)}{\int_{\theta}{}P(x,\theta)d\theta}$
 
 En donde $P(\theta | x)$ es la probabilidad a posteriori del parámetro dados los datos $x$ (esto es lo que queremos estimar), $P(x|\theta)$ es la función de verosimilitud e indica la probabilidad de observar $x$ dado $\theta$ y $P(\theta)$ refleja la creencia a priori sobre nuestro parámetro $\theta$. El denominador, que en la versión discreta sería $P(x) = \sum_{\theta}P(x,\theta)$ (se le suele denominar la *evidencia*), es precisamente el elemento que complica el cálculo de la ecuación. La integral que se ve en la fórmula puede complicarse de tal forma que hace muy difícil su cálculo de manera analítica. Aquí es donde entran en juego los métodos numéricos como [**Markov Chain Monte Carlo**](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) (MCMC). Dentro de los MCMC, hay diversos métodos, pero aquí el que voy a tratar es el algoritmo [**Metropolis-Hastings**](https://en.wikipedia.org/wiki/Metropolis–Hastings_algorithm). 
@@ -34,7 +35,8 @@ Veamos un ejemplo concreto:
 
 En primer lugar, simulemos algunos datos. En concreto, 50 valores de una distribución de Poisson con media 5. 
 
-$\center X \sim  Poi(\lambda = 5) \center$
+$<center> X \sim  Poi(\lambda = 5) </center>$
+
 $p(x|\lambda) = \frac{e^{-\lambda}\lambda^{x}}{x!}$
 
 ```{r}
