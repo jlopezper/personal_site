@@ -1,0 +1,145 @@
+---
+title: Entendiendo los métodos Markov Chain Monte Carlo
+author: Jorge Lopez
+date: '2020-04-22'
+slug: entendiendo-los-métodos-de-cadenas-de-markov-monte-carlo
+categories: 
+  - rstats
+tags:
+  - bayesian
+---
+
+
+
+<p>Una de las cosas más atractivas de la inferencia bayesiana es que permite la incorporación de conocimiento previo o creencias mediante distribuciones de probabilidad sobre los parámetros de interés. Por ejemplo, uno querría estimar cuál es la tasa de letalidad de una enfermedad y querría incorporar la información de un estudio previo, que indica que es del 0.5%. Esto confronta con la escuela frecuentista de la estadística, que asume que las probabilidades están estrictamente relacionadas con la frecuencia de los eventos. Para los frecuentistas, el valor real de este parámetro (por ej, la tasa de letalidad) es fijo y desconocido y, por tanto, no tiene sentido establecer ninguna distribución de probabilidad sobre él.</p>
+<p>Esto se traduce en que, por ejemplo, los intervalos de confianza de la estadística frecuentista tengan una interpretación que a muchos no les parece tan natural. Por ejemplo, para el caso de la letalidad, diríamos que nuestro intervalo al 90% de confianza contendrá en un 90% de las veces al valor real de la tasa de letalidad. En otras palabras, si tomamos 100 muestras independientes y calculamos el intervalo de confianza para cada una de ellas, la esperanza es que 90 de cada 100 contendrían el valor real. <a href="https://rpsychologist.com/d3/ci/">Esta</a> es una excelente visualización que muestra lo anterior.</p>
+<p>Para muchos, sin embargo, es más natural preguntarse: ¿cuál es la probabilidad de que mi parámetro esté dentro de un cierto intervalo? Esto es posible bajo el prima bayesiano. En la concepción bayesiana de la estadística se acepta que, dado que nuestro conocimiento sobre el valor real del parámetro en cuestión es limitado, tiene sentido establecer distribuciones de probabilidad sobre él. La tasa de letalidad puede ser del 0.4% con una probabilidad <span class="math inline">\(P_1\)</span>, 0.5% con una probabilidd <span class="math inline">\(P_2\)</span>, etc.</p>
+<div id="inferencia-bayesiana-problemas-y-soluciones" class="section level2">
+<h2>Inferencia bayesiana: problemas y soluciones</h2>
+<p>La estadística bayesiana, se basa en el Teorema de Bayes:</p>
+<p><span class="math display">\[
+P(\theta | x) = \frac{P(x|\theta)P(\theta)}{P(x)}
+\]</span></p>
+<p><span class="math display">\[
+P(\theta | x) = \frac{P(x|\theta)P(\theta)}{\int_{\theta}{}P(x,\theta)d\theta}
+\]</span></p>
+<p>En donde <span class="math inline">\(P(\theta | x)\)</span> es la probabilidad a posteriori del parámetro dados los datos <span class="math inline">\(x\)</span> (esto es lo que queremos estimar), <span class="math inline">\(P(x|\theta)\)</span> es la función de verosimilitud e indica la probabilidad de observar <span class="math inline">\(x\)</span> dado <span class="math inline">\(\theta\)</span> y <span class="math inline">\(P(\theta)\)</span> refleja la creencia a priori sobre nuestro parámetro <span class="math inline">\(\theta\)</span>. El denominador, que en la versión discreta sería <span class="math inline">\(P(x) = \sum_{\theta}P(x,\theta)\)</span> (se le suele denominar la <em>evidencia</em>), es precisamente el elemento que complica el cálculo de la ecuación. La integral que se ve en la fórmula puede complicarse de tal forma que hace muy difícil su cálculo de manera analítica. Aquí es donde entran en juego los métodos numéricos como <a href="https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo"><strong>Markov Chain Monte Carlo</strong></a> (MCMC). Dentro de los MCMC, hay diversos métodos, pero aquí el que voy a tratar es el algoritmo <a href="https://en.wikipedia.org/wiki/Metropolis–Hastings_algorithm"><strong>Metropolis-Hastings</strong></a>.</p>
+<p>Veamos un ejemplo concreto:</p>
+<p>En primer lugar, simulemos algunos datos. En concreto, 50 valores de una distribución de Poisson con media 5.</p>
+<p><span class="math display">\[
+X \sim  Poi(\lambda = 5) 
+\]</span>
+<span class="math display">\[
+p(x|\lambda) = \frac{e^{-\lambda}\lambda^{x}}{x!}
+\]</span></p>
+<pre class="r"><code>df &lt;- rpois(n = 50, lambda = 5)
+barplot(table(df), main = &#39;Data distribution&#39;, ylab = &#39;Count&#39;, space = 0.2)</code></pre>
+<p><img src="/posts/2020-04-22-entendiendo-los-m%C3%A9todos-de-cadenas-de-markov-monte-carlo_files/figure-html/unnamed-chunk-1-1.png" width="768" /></p>
+<p>El segundo paso es definir el modelo, que en este caso, como hemos generado los datos bajo una Poisson, la verosimilitud también será una Poisson con parámetro <span class="math inline">\(\lambda\)</span>. Por último, tenemos que fijar una distribución a priori para nuestro parámetro <span class="math inline">\(\lambda\)</span> de interés. En este caso, nuestra distribución a priori será una Gamma con parámetros de forma <span class="math inline">\(\alpha\)</span> (<em>shape</em>) y <span class="math inline">\(\beta\)</span> (<em>rate</em>) tal que su función de densidad:</p>
+<p><span class="math display">\[
+g(\lambda; \alpha, \beta) = \frac{\beta^{\alpha}\lambda^{\alpha-1}e^{-\lambda\beta}}{\Gamma (\alpha)} \propto \lambda^{\alpha-1}e^{-\lambda\beta}
+\]</span></p>
+<p>Para analizar este modelo de forma analítica es conveniente que la distribución a priori sea una Gamma, ya que la distribución a priori Gamma para <span class="math inline">\(\lambda\)</span> es conjugada (las distribuciones a priori y posteriori coinciden), es decir, que nuestra distribución a posteriori también será una Gamma. Los parámetros de esta distribución Gamma a posteriori son:</p>
+<p><span class="math display">\[
+\lambda|X \sim G(\alpha + \sum X_i , \beta + n)
+\]</span></p>
+<p>Esta distribución a posteriori se ha podido calcular de forma analítica porque las distribuciones a priori y posteriori son conjugadas, pero esto no siempre es el caso, de ahí que se requiera de métodos numéricos que solucionen este problema.</p>
+</div>
+<div id="algoritmo-metropolis-hastings" class="section level2">
+<h2>Algoritmo Metropolis-Hastings</h2>
+<p>El funcionamiento del algoritmo es el siguiente:</p>
+<ol style="list-style-type: decimal">
+<li>Comenzamos con un valor inicial aleatorio de <span class="math inline">\(\lambda\)</span>, en este caso, 3.</li>
+<li>Saltamos a otro punto cualquiera. En este caso, bajo una distribución normal con el valor actual de lambda <span class="math inline">\((\lambda_a)\)</span> como media y distribución típica fijada a 1. Este será nuestro nuevo lambda propuesto, <span class="math inline">\(\lambda_p\)</span></li>
+<li>Calculamos la verosimilitud para el valor actual y propuesto de <span class="math inline">\(\lambda\)</span>, tal que <span class="math inline">\(L(\lambda|X_1..X_n)=\prod_{i=1}^{N}\frac{e^{-\lambda}\lambda^{x_i}}{X_i!}\)</span></li>
+<li>Calculamos las probabilidades a posteriori como el producto entre la verosimilitud y la distribución a priori. Después, calculamos el ratio de aceptación, que se obtiene al dividir las probabilidades a posteriori del lambda propupuesto <span class="math inline">\((\lambda_p)\)</span> y el lambda actual <span class="math inline">\((\lambda_a)\)</span>, consiguiendo así cancelar la evidencia, <span class="math inline">\(P(x)\)</span>, que es el término del que precisamente queríamos deshacernos:</li>
+</ol>
+<p><span class="math display">\[
+\frac{P(\lambda_p | x)}{P(\lambda_a | x)}\frac{\frac{P(x|\lambda_p)P(\lambda_p)}{P(x)}}{\frac{P(x|\lambda_a)P(\lambda_a)}{P(x)}} = \frac{P(x|\lambda_p)P(\lambda_p)}{P(x|\lambda_a)P(\lambda_a)}
+\]</span></p>
+<ol start="5" style="list-style-type: decimal">
+<li>Si este ratio es mayor a un valor aleatorio entre 0 y 1, aceptamos la propuesta y tomamos <span class="math inline">\(\lambda_a = \lambda_p\)</span>. En caso contrario, mantenemos el valor actual, <span class="math inline">\(\lambda_a\)</span>. La lógica es la siguiente, a través del ratio de aceptación lo que estamos consiguiendo es que estamos recorriendo con mayor frecuencia las regiones con mayor probabilidad a posteriori en detrimento de oras con menor probabilidad.</li>
+<li>Repetimos <span class="math inline">\(N\)</span> veces.</li>
+</ol>
+<p>En código, sería así:</p>
+<pre class="r"><code>mcmc &lt;- 
+  function(iters, lambda_ini = 3, shape_prior = 5, rate_prior = 2) {
+    
+    # Valores iniciales
+    lambda_a &lt;- lambda_ini
+    posterior &lt;- lambda_a  
+    
+    # Iteramos n veces
+    for (i in seq_len(iters)) {
+      
+      # Elegimos un nuevo candidato a partir de una distirbución normal 
+      # con actual valor de lambda como media y una sd de 1
+      lambda_p &lt;- rnorm(n = 1, mean = lambda_a, sd = 1)
+      
+      # Calculamos la verosimilitud 
+      likelihood_a &lt;- prod(dpois(x = df, lambda_a))
+      likelihood_p &lt;- prod(dpois(x = df, lambda_p))
+      
+      # Calculamos la probabilidad a priori de los valores actuales y propuestos
+      prior_a &lt;- dgamma(x = lambda_a, shape = shape_prior, rate = rate_prior)
+      prior_p &lt;- dgamma(x = lambda_p, shape = shape_prior, rate = rate_prior)
+      
+      # Probabilidad a posteriori
+      p_current &lt;- likelihood_a * prior_a
+      p_proposal &lt;- likelihood_p * prior_p
+      
+      # Ratio de aceptacion
+      p_accept &lt;- p_proposal / p_current
+  
+      # Si el rario es mayor a un valor arbitrario entre 0 y 1, aceptamos propuesta
+      accept &lt;- runif(1, 0, 1) &lt; p_accept
+      if (accept) lambda_a &lt;- lambda_p 
+      
+      posterior &lt;- c(posterior, lambda_a)
+    }
+    
+    posterior
+  }</code></pre>
+<p>Veamos los resultados:</p>
+<pre class="r"><code>set.seed(1993)
+
+# Valores a priori de gamma (tambien definidos en la funcion)
+shape_prior = 5
+rate_prior = 2
+
+# Corremos el algoritmo MH
+tst &lt;- mcmc(iters = 10000)
+
+# funcion de densidad
+dd &lt;- density(tst)
+plot(dd, main = &#39;Analytical and MCMC-based posterior&#39;, col = &quot;steelblue&quot;, lwd = 1)
+# Distribucion gamma analitica a posterori
+lines(x = dd$x, y = dgamma(dd$x, 
+                           shape = sum(df) + shape_prior, 
+                           rate = rate_prior + length(df)), 
+      type = &#39;l&#39;, 
+      col = &quot;darkred&quot;,
+      lty = 2,
+      lwd = 1.5)
+legend(3, 1.3,
+       legend = c(&quot;Simulated MCMC&quot;,&quot;Analytical posterior&quot;), 
+       col = c(&quot;steelblue&quot;,&quot;darkred&quot;), 
+       lty = c(1, 2),
+       lwd = c(1.5, 1.5),
+       box.lty = 0)</code></pre>
+<p><img src="/posts/2020-04-22-entendiendo-los-m%C3%A9todos-de-cadenas-de-markov-monte-carlo_files/figure-html/unnamed-chunk-3-1.png" width="768" /></p>
+<p>Finalmente, veamos la convergencia del algoritmo al valor de <span class="math inline">\(\lambda\)</span> esperado.</p>
+<pre class="r"><code>mcmc_acum &lt;- vector(mode = &#39;numeric&#39;)
+for (i in seq(from = 0, to = 500, by = 1)) {
+  mcmc_acum &lt;- c(mcmc_acum, mean(mcmc(i, lambda_ini = 12)))
+}
+plot(x = seq_along(mcmc_acum), 
+     y = mcmc_acum, 
+     ylab = &#39;lambda&#39;,
+     type = &#39;l&#39;,
+     xlab = &#39;Iterations&#39;,
+     main = &#39;Convergence diagnosis&#39;)</code></pre>
+<p><img src="/posts/2020-04-22-entendiendo-los-m%C3%A9todos-de-cadenas-de-markov-monte-carlo_files/figure-html/unnamed-chunk-4-1.png" width="768" /></p>
+<pre class="r"><code>acf(tst, main = &#39;ACF&#39;)</code></pre>
+<p><img src="/posts/2020-04-22-entendiendo-los-m%C3%A9todos-de-cadenas-de-markov-monte-carlo_files/figure-html/unnamed-chunk-4-2.png" width="768" /></p>
+</div>
