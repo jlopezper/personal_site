@@ -1,12 +1,10 @@
 ---
-title: Entendiendo los métodos Markov Chain Monte Carlo
-author: Jorge Lopez
+title: "Entendiendo los métodos Markov Chain Monte Carlo"
+author: "Jorge Lopez"
 date: '2020-04-22'
 slug: entendiendo-los-métodos-de-cadenas-de-markov-monte-carlo
-categories: 
-  - rstats
-tags:
-  - bayesian
+tags: bayesian
+categories: rstats
 ---
 
 ```{r setup, include=FALSE}
@@ -25,7 +23,11 @@ Para muchos, sin embargo, es más natural preguntarse: ¿cuál es la probabilida
 
 La estadística bayesiana, se basa en el Teorema de Bayes:
 
-$\begin{aligned}P(\theta | x) = \frac{P(x|\theta)P(\theta)}{P(x)}\end{aligned}$
+
+
+$$
+P(\theta | x) = \frac{P(x|\theta)P(\theta)}{P(x)}
+$$
 
 $P(\theta | x) = \frac{P(x|\theta)P(\theta)}{\int_{\theta}{}P(x,\theta)d\theta}$
 
