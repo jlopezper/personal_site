@@ -1,0 +1,226 @@
+---
+title: Maximum Likelihood Estimation and the Newton-Raphson method
+author: Jorge Lopez
+date: '2020-04-26'
+slug: maximum-likelihood-estimation-and-the-newton-raphson-method
+categories:
+  - rstats
+tags:
+  - mle
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=8, fig.height=5.5) 
+```
+
+The Maximum Likelihood Estimation (MLE) is probably one of the most well-known methods for estimating the parameters of a particular statistical model, given the data. It aims at finding the parameter values that makes the observed data most likely under the assumed statistical model.
+
+Let $X_1, ... X_n$ be independent and identically distributed random variables. We assume that the data are drawn from a distribution with density $f(x|\theta)$. Given the data, we define the likelihood as follows:
+
+<center>
+$L(\theta) = \prod_{i=1}^{N}f(X_i|\theta)$
+</center>
+
+Then the goal of MLE is to find the parameters values that maximize the likelihood function, given the data.
+
+<center>
+$\widehat{\theta} = argmax_{\theta} \widehat{L}(\theta;y)$
+</center>
+
+I won't go into the details but it's quite common to take logarithms on the likelihood function (since the logarithm is a monotonically increasing function) so the maximization of the log-likelihood is equivalent to maximize the likelihood function itself and it ends up being easier to compute because the product becomes a sum.
+
+### Newton-Rapshon method
+
+Some methods have been developed to cope with the solution when the analytical solution is hard to compute, which is true most of the times. One of them is the [*Newton-Rapshon algorithm*](https://en.wikipedia.org/wiki/Newton%27s_method), developed by [Isaac Newton](https://en.wikipedia.org/wiki/Isaac_Newton) and [Joseph Raphson](https://en.wikipedia.org/wiki/Joseph_Raphson), which is used to approximate roots of real-valued functions. 
+
+We start with a initial values, $x_0$. Then, if the function satisfies the proper assumptions,
+
+<center>
+$x_{1} = x_0 - \frac{f(x_0)}{f'(x_0)}$
+</center>
+
+is a better approximation of the root than $x_0$. $(x_1, 0)$ is the intersection of the x-axis and the tangent of the function at $(x_0, f(x_0))$. In the following plot our first guess $(x_0)$ is 38 and after drawing the tangent line we see that the intersection with the x-axis is at 25.3, which becomes the $x_1$ value.
+
+![](/posts/2020-04-26-maximum-likelihood-estimation-and-the-newton-raphson-method_files/plot_zoom_png.png)
+
+The process will be repeated as
+
+<center>
+$x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}$
+</center>
+
+until the difference between $x_{n+1}$ and $x_n$ is smaller than a tiny value (it's called *epsilon* in this post).
+
+Let's see an example with a random function and then let's see the application for the MLE case. Suppose we have this function (this is the function plotted above):
+
+<center>
+$f(x) = 2x^3 + x^2 + 10$
+</center>
+
+We also know that:
+
+<center>
+$f'(x) = 6x^2 + 2x$
+</center>
+
+Let's jump to the code. Define the function and its derivative:
+
+```{r}
+# Function
+func <- function(x) 2 * x^3 + x^2 + 10
+
+# Derivative function
+dfunc <- function(x) 6 * x^2 + 2*x
+```
+
+
+Let's see how the code for the Newton-Raphsonm method looks like and run it:
+
+```{r}
+newton_raphson <- 
+  function(xn, epsilon = 1e-6, n = 500) {
+    
+    # store all values
+    values <- xn
+    
+    # loop n times (in this example we'll never reach the max number of iterations)
+    for (i in seq_len(n)) {
+      
+      # NR equation
+      xn1 <- xn - func(xn)/dfunc(xn)
+      cat("Iteration", i, "Value", xn1, "\n")
+      
+      # accumulative iteration values
+      values <- c(values, xn1)
+      
+      # if difference between xn1 and xn is less than epsilon, convergence reached
+      if(abs(xn1 - xn) < epsilon) {
+        cat("Convergence reached!", "\n")
+        res <- list(final_value = values[length(values)],
+                    values = values)
+        return(res)
+      }
+      
+      # new iteration
+      xn <- xn1
+    }
+  }
+
+
+tst <- newton_raphson(xn = 38)
+```
+
+This is the final value and all the previous ones, $x_0,...,x_{15}$:
+
+```{r}
+tst
+```
+
+
+```{r echo=FALSE, message=FALSE, results=FALSE, eval=FALSE}
+library(animation)
+
+saveGIF(
+  sapply(tst$values, function(k) {
+  x <- seq(-40,40)
+  # x <- seq(1,max(df), by = 0.1)
+  y <- sapply(x, func)
+  # y <- func(x)
+  spl <- smooth.spline(y ~ x)
+  
+  
+  plot(x, y, type = 'l', col = 'darkred', lwd = 1.5, main = 'Newton-Raphson simulation', ylab = 'f(x)')
+  abline(h=0, col=8)
+  
+  
+  newx <- k
+  pred0 <- predict(spl, x=newx, deriv=0)
+  pred1 <- predict(spl, x=newx, deriv=1)
+  
+  yint <- pred0$y - (pred1$y * newx)
+  xint <- -yint/pred1$y
+  
+  points(pred0, col='darkred', pch=19) # point to predict tangent 
+  lines(x, yint + pred1$y*x, col='steelblue', lwd = 1.5, lty = 2) # tangent (1st deriv. of spline at newx)
+  segments(x0 = newx, x1 = newx, y0 = 0, y1 = pred0$y, lty = 2, lwd = .5)
+  # text(newx, -5, round(newx, 4))
+}))
+```
+
+And this would be the whole iterations process:
+
+![](/posts/2020-04-26-maximum-likelihood-estimation-and-the-newton-raphson-method_files/animation_1.gif)
+
+### Poisson example
+
+What about a "real life example"? Assume a Poisson distribution with probability mass function: 
+
+<center>
+$P(X = x) = \frac{\lambda^x e^{-\lambda}}{x!}$
+</center>
+
+For $X_1,...,X_n$ identically distributed random variables we have a likelihood function like:
+
+
+<center>
+$L_\lambda = \prod_{i=1}^{N}\frac{\lambda^x e^{-\lambda}}{x!}$
+</center>
+<p></p>
+<center>
+$L_\lambda = \frac{\lambda^{\sum x_i} e^{-n\lambda}}{\prod x!}$
+</center>
+
+Taking logs and reordering:
+
+<center>
+$l_\lambda = log(\lambda)\sum x_i - n\lambda -\sum log(x_i!)$
+</center>
+
+Now we find the maximum likelihood estimation by taking the derivative and equaling it to zero. This lead us to conclude that the MLE is equal to the mean:
+
+<center>
+$l'_\lambda = \frac{1}{\lambda} \sum x_i - n = 0 \Leftrightarrow  \lambda = \frac{\sum x_i}{n} = \overline{X}$
+</center>
+
+Going back to the code, let's now simulate 100 observations from a Poisson distribution with $\lambda = 4$:
+
+```{r}
+set.seed(123)
+
+# Simulate 100 random values
+df <- rpois(n = 100, lambda = 4)
+
+# Mean?
+mean(df)
+
+# Probability mass function for the Poisson process
+func <- function(x) {
+  sum(df)/x - 100
+}
+
+# Derivative from the previous function
+dfunc <- function(x) {
+  -sum(df)/x^2
+  }
+
+```
+
+Now, I'm going to run the Newton-Raphson method choosing $\lambda = 7$ as starting value:
+
+```{r}
+tst <- newton_raphson(xn = 7)
+```
+
+
+![](/posts/2020-04-26-maximum-likelihood-estimation-and-the-newton-raphson-method_files/animation.gif)
+
+Great, the mean value is reached!
+
+Unfortunately, as usual, there's no free lunch. What if we had chosen a bad starting point? Well, the algorithm fail to converge and crash. 
+
+```{r error=TRUE}
+tst <- newton_raphson(xn = 15)
+```
+
+I've seen there are [some](https://www.quora.com/How-do-you-avoid-a-bad-starting-point-in-Newtons-method) mathematical approaches to deal with this, but maybe in the next chapter! 
