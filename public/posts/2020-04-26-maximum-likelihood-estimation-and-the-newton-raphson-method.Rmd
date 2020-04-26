@@ -19,13 +19,13 @@ The Maximum Likelihood Estimation (MLE) is probably one of the most well-known m
 Let $X_1, ... X_n$ be independent and identically distributed random variables. We assume that the data are drawn from a distribution with density $f(x|\theta)$. Given the data, we define the likelihood as follows:
 
 <center>
-$L(\theta) = \prod_{i=1}^{N}f(X_i|\theta)$
+$L(\theta) = \prod_{i=1}^{N}f(x_i|\theta)$
 </center>
 
 Then the goal of MLE is to find the parameters values that maximize the likelihood function, given the data.
 
 <center>
-$\widehat{\theta} = argmax_{\theta} \widehat{L}(\theta;y)$
+$\widehat{\theta} = argmax_{\theta} \widehat{L}(\theta;x)$
 </center>
 
 I won't go into the details but it's quite common to take logarithms on the likelihood function (since the logarithm is a monotonically increasing function) so the maximization of the log-likelihood is equivalent to maximize the likelihood function itself and it ends up being easier to compute because the product becomes a sum.

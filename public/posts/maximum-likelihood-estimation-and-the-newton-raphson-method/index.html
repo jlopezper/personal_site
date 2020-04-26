@@ -124,11 +124,11 @@ Let \(X_1, ... X_n\) be independent and identically distributed random variables
 <p>The Maximum Likelihood Estimation (MLE) is probably one of the most well-known methods for estimating the parameters of a particular statistical model, given the data. It aims at finding the parameter values that makes the observed data most likely under the assumed statistical model.</p>
 <p>Let <span class="math inline">\(X_1, ... X_n\)</span> be independent and identically distributed random variables. We assume that the data are drawn from a distribution with density <span class="math inline">\(f(x|\theta)\)</span>. Given the data, we define the likelihood as follows:</p>
 <center>
-<span class="math inline">\(L(\theta) = \prod_{i=1}^{N}f(X_i|\theta)\)</span>
+<span class="math inline">\(L(\theta) = \prod_{i=1}^{N}f(x_i|\theta)\)</span>
 </center>
 <p>Then the goal of MLE is to find the parameters values that maximize the likelihood function, given the data.</p>
 <center>
-<span class="math inline">\(\widehat{\theta} = argmax_{\theta} \widehat{L}(\theta;y)\)</span>
+<span class="math inline">\(\widehat{\theta} = argmax_{\theta} \widehat{L}(\theta;x)\)</span>
 </center>
 <p>I won’t go into the details but it’s quite common to take logarithms on the likelihood function (since the logarithm is a monotonically increasing function) so the maximization of the log-likelihood is equivalent to maximize the likelihood function itself and it ends up being easier to compute because the product becomes a sum.</p>
 <div id="newton-rapshon-method" class="section level3">
