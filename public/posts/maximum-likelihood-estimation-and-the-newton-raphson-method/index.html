@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Jorge López Pérez">
+    <meta name="description" content="Personal website">
+    <meta name="keywords" content="blog,developer,personal">
+
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Maximum Likelihood Estimation and the Newton-Raphson method"/>
+<meta name="twitter:description" content="The Maximum Likelihood Estimation (MLE) is probably one of the most well-known methods for estimating the parameters of a particular statistical model, given the data. It aims at finding the parameter values that makes the observed data most likely under the assumed statistical model.
+Let \(X_1, ... X_n\) be independent and identically distributed random variables. We assume that the data are drawn from a distribution with density \(f(x|\theta)\). Given the data, we define the likelihood as follows:"/>
+
+
+    <base href="/posts/maximum-likelihood-estimation-and-the-newton-raphson-method/">
+    <title>
+  Maximum Likelihood Estimation and the Newton-Raphson method · Jorge López
+</title>
+
+    <link rel="canonical" href="/posts/maximum-likelihood-estimation-and-the-newton-raphson-method/">
+
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Merriweather:300,700|Source+Code+Pro:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" integrity="sha256-oSrCnRYXvHG31SBifqP2PM1uje7SJUyX0nTwO2RJV54=" crossorigin="anonymous" />
+
+    
+      
+      
+      <link rel="stylesheet" href="/css/coder.min.ac37073bc2826cd28ef57364a9fe339de7ebcb26dafc22fd832cb35cf5b1d048.css" integrity="sha256-rDcHO8KCbNKO9XNkqf4znefryyba/CL9gyyzXPWx0Eg=" crossorigin="anonymous" media="screen" />
+    
+
+    
+
+    
+
+    
+
+    <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+    
+
+    <meta name="generator" content="Hugo 0.59.1" />
+  </head>
+
+  <body class=" ">
+    <main class="wrapper">
+      <link rel="stylesheet" href="/css/routeros.css" rel="stylesheet" id="theme-stylesheet">
+<script src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<nav class="navigation">
+  <section class="container">
+    <a class="navigation-title" href="/">
+      Jorge López
+    </a>
+    <input type="checkbox" id="menu-toggle" />
+    <label class="menu-button float-right" for="menu-toggle"><i class="fas fa-bars"></i></label>
+    <ul class="navigation-list">
+      
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/about/">About</a>
+          </li>
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/posts/">Blog</a>
+          </li>
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/projects/">Projects</a>
+          </li>
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/contact/">Contact</a>
+          </li>
+        
+      
+      
+    </ul>
+  </section>
+</nav>
+
+
+      <div class="content">
+        
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">Maximum Likelihood Estimation and the Newton-Raphson method</h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fas fa-calendar"></i>
+              <time datetime='2020-04-26T00:00:00Z'>
+                April 26, 2020
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fas fa-clock"></i>
+              5 minutes read
+            </span>
+          </div>
+          <div class="categories">
+  <i class="fas fa-folder"></i>
+    <a href="/categories/rstats/">rstats</a></div>
+
+          <div class="tags">
+  <i class="fas fa-tag"></i>
+    <a href="/tags/mle/">mle</a></div>
+
+        </div>
+      </header>
+
+      <div>
+        
+
+
+<p>The Maximum Likelihood Estimation (MLE) is probably one of the most well-known methods for estimating the parameters of a particular statistical model, given the data. It aims at finding the parameter values that makes the observed data most likely under the assumed statistical model.</p>
+<p>Let <span class="math inline">\(X_1, ... X_n\)</span> be independent and identically distributed random variables. We assume that the data are drawn from a distribution with density <span class="math inline">\(f(x|\theta)\)</span>. Given the data, we define the likelihood as follows:</p>
+<center>
+<span class="math inline">\(L(\theta) = \prod_{i=1}^{N}f_{Xi}(X_i|\theta)\)</span>
+</center>
+<p>Then the goal of MLE is to find the parameters values that maximize the likelihood function, given the data.</p>
+<center>
+<span class="math inline">\(\widehat{\theta} = argmax_{\theta} \widehat{L}(\theta;y)\)</span>
+</center>
+<p>I won’t go into the details but it’s quite common to take logarithms on the likelihood function (since the logarithm is a monotonically increasing function) so the maximization of the log-likelihood is equivalent to maximize the likelihood function itself and it ends up being easier to compute because the product becomes a sum.</p>
+<div id="newton-rapshon-method" class="section level3">
+<h3>Newton-Rapshon method</h3>
+<p>Some methods have been developed to cope with the solution when the analytical solution is hard to compute, which is true most of the times. One of them is the <a href="https://en.wikipedia.org/wiki/Newton%27s_method"><em>Newton-Rapshon algorithm</em></a>, developed by <a href="https://en.wikipedia.org/wiki/Isaac_Newton">Isaac Newton</a> and <a href="https://en.wikipedia.org/wiki/Joseph_Raphson">Joseph Raphson</a>, which is used to approximate roots of real-valued functions.</p>
+<p>We start with a initial values, <span class="math inline">\(x_0\)</span>. Then, if the function satisfies the proper assumptions,</p>
+<center>
+<span class="math inline">\(x_{1} = x_0 - \frac{f(x_0)}{f&#39;(x_0)}\)</span>
+</center>
+<p>is a better approximation of the root than <span class="math inline">\(x_0\)</span>. <span class="math inline">\((x_1, 0)\)</span> is the intersection of the x-axis and the tangent of the function at <span class="math inline">\((x_0, f(x_0))\)</span>. In the following plot our first guess <span class="math inline">\((x_0)\)</span> is 38 and after drawing the tangent line we see that the intersection with the x-axis is at 25.3, which becomes the <span class="math inline">\(x_1\)</span> value.</p>
+<p><img src="/posts/2020-04-26-maximum-likelihood-estimation-and-the-newton-raphson-method_files/plot_zoom_png.png" /></p>
+<p>The process will be repeated as</p>
+<center>
+<span class="math inline">\(x_{n+1} = x_n - \frac{f(x_n)}{f&#39;(x_n)}\)</span>
+</center>
+<p>until the difference between <span class="math inline">\(x_{n+1}\)</span> and <span class="math inline">\(x_n\)</span> is smaller than a tiny value (it’s called <em>epsilon</em> in this post).</p>
+<p>Let’s see an example with a random function and then let’s see the application for the MLE case. Suppose we have this function (this is the function plotted above):</p>
+<center>
+<span class="math inline">\(f(x) = 2x^3 + x^2 + 10\)</span>
+</center>
+<p>We also know that:</p>
+<center>
+<span class="math inline">\(f&#39;(x) = 6x^2 + 2x\)</span>
+</center>
+<p>Let’s jump to the code. Define the function and its derivative:</p>
+<pre class="r"><code># Function
+func &lt;- function(x) 2 * x^3 + x^2 + 10
+
+# Derivative function
+dfunc &lt;- function(x) 6 * x^2 + 2*x</code></pre>
+<p>Let’s see how the code for the Newton-Raphsonm method looks like and run it:</p>
+<pre class="r"><code>newton_raphson &lt;- 
+  function(xn, epsilon = 1e-6, n = 500) {
+    
+    # store all values
+    values &lt;- xn
+    
+    # loop n times (in this example we&#39;ll never reach the max number of iterations)
+    for (i in seq_len(n)) {
+      
+      # NR equation
+      xn1 &lt;- xn - func(xn)/dfunc(xn)
+      cat(&quot;Iteration&quot;, i, &quot;Value&quot;, xn1, &quot;\n&quot;)
+      
+      # accumulative iteration values
+      values &lt;- c(values, xn1)
+      
+      # if difference between xn1 and xn is less than epsilon, convergence reached
+      if(abs(xn1 - xn) &lt; epsilon) {
+        cat(&quot;Convergence reached!&quot;, &quot;\n&quot;)
+        res &lt;- list(final_value = values[length(values)],
+                    values = values)
+        return(res)
+      }
+      
+      # new iteration
+      xn &lt;- xn1
+    }
+  }
+
+
+tst &lt;- newton_raphson(xn = 38)</code></pre>
+<pre><code>## Iteration 1 Value 25.27712 
+## Iteration 2 Value 16.794 
+## Iteration 3 Value 11.13573 
+## Iteration 4 Value 7.356832 
+## Iteration 5 Value 4.821948 
+## Iteration 6 Value 3.095622 
+## Iteration 7 Value 1.856579 
+## Iteration 8 Value 0.7806913 
+## Iteration 9 Value -1.434821 
+## Iteration 10 Value -2.083476 
+## Iteration 11 Value -1.912195 
+## Iteration 12 Value -1.894124 
+## Iteration 13 Value -1.893932 
+## Iteration 14 Value -1.893932 
+## Convergence reached!</code></pre>
+<p>This is the final value and all the previous ones, <span class="math inline">\(x_0,...,x_{15}\)</span>:</p>
+<pre class="r"><code>tst</code></pre>
+<pre><code>## $final_value
+## [1] -1.893932
+## 
+## $values
+##  [1] 38.0000000 25.2771167 16.7940041 11.1357341  7.3568321  4.8219479
+##  [7]  3.0956224  1.8565792  0.7806913 -1.4348208 -2.0834756 -1.9121949
+## [13] -1.8941237 -1.8939316 -1.8939315</code></pre>
+<p>And this would be the whole iterations process:</p>
+<p><img src="/posts/2020-04-26-maximum-likelihood-estimation-and-the-newton-raphson-method_files/animation_1.gif" /></p>
+</div>
+<div id="poisson-example" class="section level3">
+<h3>Poisson example</h3>
+<p>What about a “real life example”? Assume a Poisson distribution with probability mass function:</p>
+<center>
+<span class="math inline">\(P(X = x) = \frac{\lambda^x e^{-\lambda}}{x!}\)</span>
+</center>
+<p>For <span class="math inline">\(X_1,...,X_n\)</span> identically distributed random variables we have a likelihood function like:</p>
+<center>
+<span class="math inline">\(L_\lambda = \prod_{i=1}^{N}\frac{\lambda^x e^{-\lambda}}{x!}\)</span>
+</center>
+<p>
+</p>
+<center>
+<span class="math inline">\(L_\lambda = \frac{\lambda^{\sum x_i} e^{-n\lambda}}{\prod x!}\)</span>
+</center>
+<p>Taking logs and reordering:</p>
+<center>
+<span class="math inline">\(l_\lambda = log(\lambda)\sum x_i - n\lambda -\sum log(x_i!)\)</span>
+</center>
+<p>Now we find the maximum likelihood estimation by taking the derivative and equaling it to zero. This lead us to conclude that the MLE is equal to the mean:</p>
+<center>
+<span class="math inline">\(l&#39;_\lambda = \frac{1}{\lambda} \sum x_i - n = 0 \Leftrightarrow \lambda = \frac{\sum x_i}{n} = \overline{X}\)</span>
+</center>
+<p>Going back to the code, let’s now simulate 100 observations from a Poisson distribution with <span class="math inline">\(\lambda = 4\)</span>:</p>
+<pre class="r"><code>set.seed(123)
+
+# Simulate 100 random values
+df &lt;- rpois(n = 100, lambda = 4)
+
+# Mean?
+mean(df)</code></pre>
+<pre><code>## [1] 4.09</code></pre>
+<pre class="r"><code># Probability mass function for the Poisson process
+func &lt;- function(x) {
+  sum(df)/x - 100
+}
+
+# Derivative from the previous function
+dfunc &lt;- function(x) {
+  -sum(df)/x^2
+  }</code></pre>
+<p>Now, I’m going to run the Newton-Raphson method choosing <span class="math inline">\(\lambda = 7\)</span> as starting value:</p>
+<pre class="r"><code>tst &lt;- newton_raphson(xn = 7)</code></pre>
+<pre><code>## Iteration 1 Value 2.01956 
+## Iteration 2 Value 3.041902 
+## Iteration 3 Value 3.821416 
+## Iteration 4 Value 4.072362 
+## Iteration 5 Value 4.089924 
+## Iteration 6 Value 4.09 
+## Iteration 7 Value 4.09 
+## Convergence reached!</code></pre>
+<p><img src="/posts/2020-04-26-maximum-likelihood-estimation-and-the-newton-raphson-method_files/animation.gif" /></p>
+<p>Great, the mean value is reached!</p>
+<p>Unfortunately, as usual, there’s no free lunch. What if we had chosen a bad starting point? Well, the algorithm fail to converge and crash.</p>
+<pre class="r"><code>tst &lt;- newton_raphson(xn = 15)</code></pre>
+<pre><code>## Iteration 1 Value -25.01222 
+## Iteration 2 Value -202.9857 
+## Iteration 3 Value -10480.1 
+## Iteration 4 Value -26874867 
+## Iteration 5 Value -1.765914e+14 
+## Iteration 6 Value -7.624575e+27 
+## Iteration 7 Value -1.421373e+55 
+## Iteration 8 Value -4.939609e+109 
+## Iteration 9 Value -5.965707e+218 
+## Iteration 10 Value -Inf 
+## Iteration 11 Value -Inf</code></pre>
+<pre><code>## Error in if (abs(xn1 - xn) &lt; epsilon) {: valor ausente donde TRUE/FALSE es necesario</code></pre>
+<p>I’ve seen there are <a href="https://www.quora.com/How-do-you-avoid-a-bad-starting-point-in-Newtons-method">some</a> mathematical approaches to deal with this, but maybe in the next chapter!</p>
+</div>
+
+      </div>
+
+      <footer>
+        <div id="disqus_thread"></div>
+<script>
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://jlopezper.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      </footer>
+    </article>
+
+    
+  </section>
+
+      </div>
+
+      <footer class="footer">
+  <section class="container">
+    
+     © 2020
+    
+       · 
+      Powered by <a href="https://gohugo.io/">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/">Coder</a>.
+    
+    
+       · 
+      [<a href="https://github.com/luizdepra/hugo-coder/tree/"></a>]
+    
+  </section>
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+  });
+  MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+
+  MathJax.Hub.Config({
+  
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+  });
+</script> 
+</footer>
+
+
+
+    </main>
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-163611522-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+
+  </body>
+
+</html>
