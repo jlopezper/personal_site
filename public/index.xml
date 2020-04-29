@@ -6,10 +6,20 @@
     <description>Recent content on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 26 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 29 Apr 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>This is why you should consider using model-based clustering</title>
+      <link>/posts/this-is-why-you-should-consider-using-model-based-clustering/</link>
+      <pubDate>Wed, 29 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/this-is-why-you-should-consider-using-model-based-clustering/</guid>
+      <description>Let’s suppose you have the following data. It contains 177 wines with some characteristics about them. You’d like to group them in such way you can create a marketing campaign, for example.
+set.seed(143) pkgs &amp;lt;- c(&amp;quot;mclust&amp;quot;, &amp;quot;dplyr&amp;quot;) invisible(lapply(pkgs, require, character.only = TRUE)) df &amp;lt;- read.csv(&amp;#39;https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data&amp;#39;) names(df) &amp;lt;- c(&amp;#39;Type&amp;#39;, &amp;#39;Alcohol&amp;#39;, &amp;#39;Malic_acid&amp;#39;, &amp;#39;Ash&amp;#39;, &amp;#39;Alcalinity&amp;#39;, &amp;#39;Magnesium&amp;#39;, &amp;#39;Total_phenols&amp;#39;, &amp;#39;Flavanoids&amp;#39;, &amp;#39;Nonflavanoid_phenols&amp;#39;, &amp;#39;Proanthocyanins&amp;#39;, &amp;#39;Color_intensity&amp;#39;, &amp;#39;Hue&amp;#39;, &amp;#39;OD280&amp;#39;, &amp;#39;Proline&amp;#39;) df &amp;lt;- df %&amp;gt;% select(-Type) glimpse(df) ## Observations: 177 ## Variables: 13 ## $ Alcohol &amp;lt;dbl&amp;gt; 13.</description>
+    </item>
     
     <item>
       <title>Maximum Likelihood Estimation and the Newton-Raphson method</title>

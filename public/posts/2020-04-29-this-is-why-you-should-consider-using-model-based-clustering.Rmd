@@ -1,0 +1,59 @@
+---
+title: This is why you should consider using model-based clustering
+author: Jorge Lopez
+date: '2020-04-29'
+slug: this-is-why-you-should-consider-using-model-based-clustering
+categories: []
+tags:
+  - clustering
+---
+
+Let's suppose you have the following data. It contains 177 wines with some characteristics about them. You'd like to group them in such way you can create a marketing campaign, for example. 
+
+
+```{r echo=TRUE, message=FALSE}
+set.seed(143)
+pkgs <- c("mclust", "dplyr")
+invisible(lapply(pkgs, require, character.only = TRUE))
+
+df <- read.csv('https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data')
+names(df) <- c('Type', 'Alcohol', 'Malic_acid', 'Ash', 'Alcalinity',
+               'Magnesium', 'Total_phenols', 'Flavanoids',
+               'Nonflavanoid_phenols', 'Proanthocyanins',
+               'Color_intensity', 'Hue', 'OD280', 'Proline')
+df <- df %>% select(-Type)
+
+glimpse(df)
+```
+
+
+You decided in some analytical way that the number of groups that best fits your needs is 3. Then you're probably tempted to run a K-means clustering method to build the groups. This of course makes sense, but you could get a more exciting result. Model-based clustering attempts to manage the fact that traditional clustering algorithms (like K-Means) derive their results without considering uncertainty to the cluster assignments. The most well-known approaches are probably based on Gaussian Mixture Models.
+
+If you run the K-Means method you'll get something like this:
+
+```{r}
+km <- kmeans(df, centers = 3, iter.max = 10)
+
+plot(df[,c(1:5)], col = c('red3', 'dodgerblue2', 'green3')[km$cluster], pch = 20, main = 'K-Means')
+```
+
+
+And with a Gaussian Mixture Model you could get something like:
+
+```{r}
+clust <- Mclust(df, G = 3)
+
+plot(clust, what = "uncertainty", addEllipses = FALSE, dimens = c(1:5), cex = 1.7)
+```
+
+These would be the wines with the most uncertainty:
+
+```{r}
+as.data.frame(round(predict(clust, df)$z, 2))[sort(clust$uncertainty, index.return=TRUE, decreasing=TRUE)$ix[1:5],]
+```
+
+Where the larger the data point, the higher the uncertainty. In this example you might see there're only few data points where this uncertainty is present, so it seems all clusters are well-defined, but in more complex examples this could be crucial in order to make a decision. Suppose you'd like to send emails for a specific marketing campaign. The decision of whether or not to impact customers could be relevant, so you might consider not affecting those customers who are between two groups. 
+
+
+
+

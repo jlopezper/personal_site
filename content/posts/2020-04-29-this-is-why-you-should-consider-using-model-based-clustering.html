@@ -1,0 +1,60 @@
+---
+title: This is why you should consider using model-based clustering
+author: Jorge Lopez
+date: '2020-04-29'
+slug: this-is-why-you-should-consider-using-model-based-clustering
+categories: []
+tags:
+  - clustering
+---
+
+
+
+<p>Let’s suppose you have the following data. It contains 177 wines with some characteristics about them. You’d like to group them in such way you can create a marketing campaign, for example.</p>
+<pre class="r"><code>set.seed(143)
+pkgs &lt;- c(&quot;mclust&quot;, &quot;dplyr&quot;)
+invisible(lapply(pkgs, require, character.only = TRUE))
+
+df &lt;- read.csv(&#39;https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data&#39;)
+names(df) &lt;- c(&#39;Type&#39;, &#39;Alcohol&#39;, &#39;Malic_acid&#39;, &#39;Ash&#39;, &#39;Alcalinity&#39;,
+               &#39;Magnesium&#39;, &#39;Total_phenols&#39;, &#39;Flavanoids&#39;,
+               &#39;Nonflavanoid_phenols&#39;, &#39;Proanthocyanins&#39;,
+               &#39;Color_intensity&#39;, &#39;Hue&#39;, &#39;OD280&#39;, &#39;Proline&#39;)
+df &lt;- df %&gt;% select(-Type)
+
+glimpse(df)</code></pre>
+<pre><code>## Observations: 177
+## Variables: 13
+## $ Alcohol              &lt;dbl&gt; 13.20, 13.16, 14.37, 13.24, 14.20, 14.39, 1…
+## $ Malic_acid           &lt;dbl&gt; 1.78, 2.36, 1.95, 2.59, 1.76, 1.87, 2.15, 1…
+## $ Ash                  &lt;dbl&gt; 2.14, 2.67, 2.50, 2.87, 2.45, 2.45, 2.61, 2…
+## $ Alcalinity           &lt;dbl&gt; 11.2, 18.6, 16.8, 21.0, 15.2, 14.6, 17.6, 1…
+## $ Magnesium            &lt;int&gt; 100, 101, 113, 118, 112, 96, 121, 97, 98, 1…
+## $ Total_phenols        &lt;dbl&gt; 2.65, 2.80, 3.85, 2.80, 3.27, 2.50, 2.60, 2…
+## $ Flavanoids           &lt;dbl&gt; 2.76, 3.24, 3.49, 2.69, 3.39, 2.52, 2.51, 2…
+## $ Nonflavanoid_phenols &lt;dbl&gt; 0.26, 0.30, 0.24, 0.39, 0.34, 0.30, 0.31, 0…
+## $ Proanthocyanins      &lt;dbl&gt; 1.28, 2.81, 2.18, 1.82, 1.97, 1.98, 1.25, 1…
+## $ Color_intensity      &lt;dbl&gt; 4.38, 5.68, 7.80, 4.32, 6.75, 5.25, 5.05, 5…
+## $ Hue                  &lt;dbl&gt; 1.05, 1.03, 0.86, 1.04, 1.05, 1.02, 1.06, 1…
+## $ OD280                &lt;dbl&gt; 3.40, 3.17, 3.45, 2.93, 2.85, 3.58, 3.58, 2…
+## $ Proline              &lt;int&gt; 1050, 1185, 1480, 735, 1450, 1290, 1295, 10…</code></pre>
+<p>You decided in some analytical way that the number of groups that best fits your needs is 3. Then you’re probably tempted to run a K-means clustering method to build the groups. This of course makes sense, but you could get a more exciting result. Model-based clustering attempts to manage the fact that traditional clustering algorithms (like K-Means) derive their results without considering uncertainty to the cluster assignments. The most well-known approaches are probably based on Gaussian Mixture Models.</p>
+<p>If you run the K-Means method you’ll get something like this:</p>
+<pre class="r"><code>km &lt;- kmeans(df, centers = 3, iter.max = 10)
+
+plot(df[,c(1:5)], col = c(&#39;red3&#39;, &#39;dodgerblue2&#39;, &#39;green3&#39;)[km$cluster], pch = 20, main = &#39;K-Means&#39;)</code></pre>
+<p><img src="/posts/2020-04-29-this-is-why-you-should-consider-using-model-based-clustering_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>And with a Gaussian Mixture Model you could get something like:</p>
+<pre class="r"><code>clust &lt;- Mclust(df, G = 3)
+
+plot(clust, what = &quot;uncertainty&quot;, addEllipses = FALSE, dimens = c(1:5), cex = 1.7)</code></pre>
+<p><img src="/posts/2020-04-29-this-is-why-you-should-consider-using-model-based-clustering_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>These would be the wines with the most uncertainty:</p>
+<pre class="r"><code>as.data.frame(round(predict(clust, df)$z, 2))[sort(clust$uncertainty, index.return=TRUE, decreasing=TRUE)$ix[1:5],]</code></pre>
+<pre><code>##       1    2    3
+## 70 0.00 0.22 0.78
+## 25 0.78 0.22 0.00
+## 81 0.03 0.97 0.00
+## 43 0.98 0.02 0.00
+## 4  0.99 0.01 0.00</code></pre>
+<p>Where the larger the data point, the higher the uncertainty. In this example you might see there’re only few data points where this uncertainty is present, so it seems all clusters are well-defined, but in more complex examples this could be crucial in order to make a decision. Suppose you’d like to send emails for a specific marketing campaign. The decision of whether or not to impact customers could be relevant, so you might consider not affecting those customers who are between two groups.</p>
