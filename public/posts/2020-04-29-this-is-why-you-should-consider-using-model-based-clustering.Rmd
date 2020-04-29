@@ -46,7 +46,7 @@ clust <- Mclust(df, G = 3)
 plot(clust, what = "uncertainty", addEllipses = FALSE, dimens = c(1:5), cex = 1.7)
 ```
 
-These would be the wines with the most uncertainty:
+These would be the wines with the most uncertainty. Each column represents the probability that each observation belongs to that specific group.
 
 ```{r}
 as.data.frame(round(predict(clust, df)$z, 2))[sort(clust$uncertainty, index.return=TRUE, decreasing=TRUE)$ix[1:5],]
