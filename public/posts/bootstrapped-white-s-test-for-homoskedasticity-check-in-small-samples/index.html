@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Jorge López Pérez">
+    <meta name="description" content="Personal website">
+    <meta name="keywords" content="blog,developer,personal">
+
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Bootstrapped White&#39;s test for checking homoskedasticity in small samples"/>
+<meta name="twitter:description" content="I came across this paper where the authors developed a bootstrapped version of the well-known White test. This test checks whether the variance of the residuals in a linear regression model is constant (homoskedasticity). Remember that this is one of the assumptions for a linear regression model to be valid.
+The test statistic can be formulated as:
+ \(W = nR^2\)  where \(n\) is the number of observations and \(R^2\) is the R-squared of the auxiliary regression of the residuals against fitted values (further details for example here)."/>
+
+
+    <base href="/posts/bootstrapped-white-s-test-for-homoskedasticity-check-in-small-samples/">
+    <title>
+  Bootstrapped White&#39;s test for checking homoskedasticity in small samples · Jorge López
+</title>
+
+    <link rel="canonical" href="/posts/bootstrapped-white-s-test-for-homoskedasticity-check-in-small-samples/">
+
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Merriweather:300,700|Source+Code+Pro:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" integrity="sha256-oSrCnRYXvHG31SBifqP2PM1uje7SJUyX0nTwO2RJV54=" crossorigin="anonymous" />
+
+    
+      
+      
+      <link rel="stylesheet" href="/css/coder.min.ac37073bc2826cd28ef57364a9fe339de7ebcb26dafc22fd832cb35cf5b1d048.css" integrity="sha256-rDcHO8KCbNKO9XNkqf4znefryyba/CL9gyyzXPWx0Eg=" crossorigin="anonymous" media="screen" />
+    
+
+    
+
+    
+
+    
+
+    <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+    
+
+    <meta name="generator" content="Hugo 0.59.1" />
+  </head>
+
+  <body class=" ">
+    <main class="wrapper">
+      <link rel="stylesheet" href="/css/routeros.css" rel="stylesheet" id="theme-stylesheet">
+<script src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<nav class="navigation">
+  <section class="container">
+    <a class="navigation-title" href="/">
+      Jorge López
+    </a>
+    <input type="checkbox" id="menu-toggle" />
+    <label class="menu-button float-right" for="menu-toggle"><i class="fas fa-bars"></i></label>
+    <ul class="navigation-list">
+      
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/about/">About</a>
+          </li>
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/posts/">Blog</a>
+          </li>
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/projects/">Projects</a>
+          </li>
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/contact/">Contact</a>
+          </li>
+        
+      
+      
+    </ul>
+  </section>
+</nav>
+
+
+      <div class="content">
+        
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">Bootstrapped White&#39;s test for checking homoskedasticity in small samples</h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fas fa-calendar"></i>
+              <time datetime='2020-05-04T00:00:00Z'>
+                May 4, 2020
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fas fa-clock"></i>
+              3 minutes read
+            </span>
+          </div>
+          <div class="categories">
+  <i class="fas fa-folder"></i>
+    <a href="/categories/rstats/">rstats</a></div>
+
+          
+        </div>
+      </header>
+
+      <div>
+        
+
+
+<p>I came across this <a href="https://www.sciencedirect.com/science/article/abs/pii/S0165176599000361">paper</a> where the authors developed a bootstrapped version of the well-known White test. This test checks whether the variance of the residuals in a linear regression model is constant (homoskedasticity). Remember that this is one of the assumptions for a linear regression model to be valid.</p>
+<p>The test statistic can be formulated as:</p>
+<center>
+<span class="math inline">\(W = nR^2\)</span>
+</center>
+<p>where <span class="math inline">\(n\)</span> is the number of observations and <span class="math inline">\(R^2\)</span> is the R-squared of the auxiliary regression of the residuals against fitted values (further details for example <a href="http://www3.grips.ac.jp/~yamanota/Lecture_Note_9_Heteroskedasticity">here</a>). This test statistic follows a Chi-squared distribution with K-1 degrees of freedom, where K is the number of estimated parameters in the auxiliary regression.</p>
+<p>One of the main drawbacks of this method is that it usually performs poorly in small sample sizes, resulting in poor statistical power.</p>
+<p>Let’s simulate some fake data that suffer from heteroskedasticity:</p>
+<pre class="r"><code># Seed and packages
+set.seed(1)
+pkgs &lt;- c(&quot;dplyr&quot;, &quot;tidyr&quot;, &quot;ggplot2&quot;)
+invisible(lapply(pkgs, require, character.only = TRUE))
+
+# Set sample size 
+n &lt;- 60
+# Generate heteroscedastic data
+y &lt;- 1:n
+sd &lt;- runif(n, min = 0, max = 4)
+error &lt;- rnorm(n, 0, sd*y) 
+X &lt;- y+error 
+df &lt;- data.frame(y, X)
+
+ggplot(df, aes(y, X)) + 
+  geom_point() +
+  theme_minimal() +
+  labs(title = &#39;Heteroskedastic data&#39;) +
+    theme(plot.title = element_text(size=15)) </code></pre>
+<p><img src="/posts/2020-05-04-bootstrapped-white-s-test-for-homoskedasticity-check-in-small-samples_files/figure-html/unnamed-chunk-1-1.png" width="768" /></p>
+<p>Let’s now run 100 simulations with several sample sizes and compute the p-values for the original test and the bootstrapped version linked above. Sorry in advance for the ugly code:</p>
+<pre class="r"><code>tst &lt;- tibble()
+
+# For k samples size
+for (k in c(20,30,40,50,80,100)) {
+
+  pvalues_orig &lt;- vector(&#39;numeric&#39;)
+  pvalues_boot &lt;- vector(&#39;numeric&#39;)
+  
+  for (j in 1:100) {
+    
+    # Set sample size 
+    n &lt;- k
+    # Generate heteroscedastic data
+    y &lt;- 1:n
+    sd &lt;- runif(n, min = 0, max = 4)
+    error &lt;- rnorm(n,0,sd*y) 
+    X &lt;- y+error
+    
+    df &lt;- data.frame(y, X)
+    
+    
+    # White test
+    m &lt;- lm(y ~ X, data = df)
+    u2 &lt;- m$residuals^2
+    y &lt;- fitted(m)
+    Ru2 &lt;- summary(lm(u2 ~ y + I(y^2)))$r.squared
+    LM &lt;- nrow(df)*Ru2
+    p.value &lt;- 1-pchisq(LM, 2)
+    pvalues_orig &lt;- c(pvalues_orig, p.value)
+    
+    
+    # Bootstrapped White test
+    W &lt;- vector(mode = &#39;numeric&#39;)
+    bcount &lt;- 0
+  
+    for (i in 1:1000) {
+      # Paper&#39;s methodology
+      linfit &lt;- lm(y ~ X, data = df)
+      pred &lt;- fitted(linfit)
+      res &lt;- residuals(linfit)
+      var_res &lt;- summary(linfit)$sigma^2
+      bootstrapped_error &lt;- var_res * rnorm(n = nrow(df), mean = 0, sd = 1)
+      df$new_y &lt;- df$y + bootstrapped_error
+      m &lt;- lm(new_y ~ X, data = df)
+      Ru2 &lt;- summary(lm(m$residuals^2 ~ fitted(m) + I(fitted(m)^2)))$r.squared
+      LM_b &lt;- nrow(df)*Ru2
+      
+      # compute p-value
+      if(abs(LM_b) &gt;= abs(LM)) {
+        bcount &lt;- bcount + 1
+      }
+      
+      W[i] &lt;- LM_b
+    }
+    
+    pvalues_boot &lt;- c(pvalues_boot, bcount/1000)
+    
+  }
+  
+  # final data.frame
+  tst &lt;- bind_rows(tst, 
+                   tibble(
+                     sample_size = k,
+                     pvalues_boot = pvalues_boot,
+                     pvalues = pvalues_orig))
+  
+}</code></pre>
+<p>And finally, this is the result, which shows —as the authors state— an improvement in the outcome for small samples.</p>
+<p><img src="/posts/2020-05-04-bootstrapped-white-s-test-for-homoskedasticity-check-in-small-samples_files/figure-html/unnamed-chunk-3-1.png" width="110%" /></p>
+
+      </div>
+
+      <footer>
+        <div id="disqus_thread"></div>
+<script>
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://jlopezper.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      </footer>
+    </article>
+
+    
+  </section>
+
+      </div>
+
+      <footer class="footer">
+  <section class="container">
+    
+     © 2020
+    
+       · 
+      Powered by <a href="https://gohugo.io/">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/">Coder</a>.
+    
+    
+       · 
+      [<a href="https://github.com/luizdepra/hugo-coder/tree/"></a>]
+    
+  </section>
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+  });
+  MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+
+  MathJax.Hub.Config({
+  
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+  });
+</script> 
+</footer>
+
+
+
+    </main>
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-163611522-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+
+  </body>
+
+</html>

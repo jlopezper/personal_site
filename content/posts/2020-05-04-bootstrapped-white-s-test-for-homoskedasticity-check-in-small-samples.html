@@ -1,0 +1,109 @@
+---
+title: Bootstrapped White's test for checking homoskedasticity in small samples
+author: Jorge Lopez
+date: '2020-05-04'
+slug: bootstrapped-white-s-test-for-homoskedasticity-check-in-small-samples
+categories:
+  - rstats
+---
+
+
+
+<p>I came across this <a href="https://www.sciencedirect.com/science/article/abs/pii/S0165176599000361">paper</a> where the authors developed a bootstrapped version of the well-known White test. This test checks whether the variance of the residuals in a linear regression model is constant (homoskedasticity). Remember that this is one of the assumptions for a linear regression model to be valid.</p>
+<p>The test statistic can be formulated as:</p>
+<center>
+<span class="math inline">\(W = nR^2\)</span>
+</center>
+<p>where <span class="math inline">\(n\)</span> is the number of observations and <span class="math inline">\(R^2\)</span> is the R-squared of the auxiliary regression of the residuals against fitted values (further details for example <a href="http://www3.grips.ac.jp/~yamanota/Lecture_Note_9_Heteroskedasticity">here</a>). This test statistic follows a Chi-squared distribution with K-1 degrees of freedom, where K is the number of estimated parameters in the auxiliary regression.</p>
+<p>One of the main drawbacks of this method is that it usually performs poorly in small sample sizes, resulting in poor statistical power.</p>
+<p>Let’s simulate some fake data that suffer from heteroskedasticity:</p>
+<pre class="r"><code># Seed and packages
+set.seed(1)
+pkgs &lt;- c(&quot;dplyr&quot;, &quot;tidyr&quot;, &quot;ggplot2&quot;)
+invisible(lapply(pkgs, require, character.only = TRUE))
+
+# Set sample size 
+n &lt;- 60
+# Generate heteroscedastic data
+y &lt;- 1:n
+sd &lt;- runif(n, min = 0, max = 4)
+error &lt;- rnorm(n, 0, sd*y) 
+X &lt;- y+error 
+df &lt;- data.frame(y, X)
+
+ggplot(df, aes(y, X)) + 
+  geom_point() +
+  theme_minimal() +
+  labs(title = &#39;Heteroskedastic data&#39;) +
+    theme(plot.title = element_text(size=15)) </code></pre>
+<p><img src="/posts/2020-05-04-bootstrapped-white-s-test-for-homoskedasticity-check-in-small-samples_files/figure-html/unnamed-chunk-1-1.png" width="768" /></p>
+<p>Let’s now run 100 simulations with several sample sizes and compute the p-values for the original test and the bootstrapped version linked above. Sorry in advance for the ugly code:</p>
+<pre class="r"><code>tst &lt;- tibble()
+
+# For k samples size
+for (k in c(20,30,40,50,80,100)) {
+
+  pvalues_orig &lt;- vector(&#39;numeric&#39;)
+  pvalues_boot &lt;- vector(&#39;numeric&#39;)
+  
+  for (j in 1:100) {
+    
+    # Set sample size 
+    n &lt;- k
+    # Generate heteroscedastic data
+    y &lt;- 1:n
+    sd &lt;- runif(n, min = 0, max = 4)
+    error &lt;- rnorm(n,0,sd*y) 
+    X &lt;- y+error
+    
+    df &lt;- data.frame(y, X)
+    
+    
+    # White test
+    m &lt;- lm(y ~ X, data = df)
+    u2 &lt;- m$residuals^2
+    y &lt;- fitted(m)
+    Ru2 &lt;- summary(lm(u2 ~ y + I(y^2)))$r.squared
+    LM &lt;- nrow(df)*Ru2
+    p.value &lt;- 1-pchisq(LM, 2)
+    pvalues_orig &lt;- c(pvalues_orig, p.value)
+    
+    
+    # Bootstrapped White test
+    W &lt;- vector(mode = &#39;numeric&#39;)
+    bcount &lt;- 0
+  
+    for (i in 1:1000) {
+      # Paper&#39;s methodology
+      linfit &lt;- lm(y ~ X, data = df)
+      pred &lt;- fitted(linfit)
+      res &lt;- residuals(linfit)
+      var_res &lt;- summary(linfit)$sigma^2
+      bootstrapped_error &lt;- var_res * rnorm(n = nrow(df), mean = 0, sd = 1)
+      df$new_y &lt;- df$y + bootstrapped_error
+      m &lt;- lm(new_y ~ X, data = df)
+      Ru2 &lt;- summary(lm(m$residuals^2 ~ fitted(m) + I(fitted(m)^2)))$r.squared
+      LM_b &lt;- nrow(df)*Ru2
+      
+      # compute p-value
+      if(abs(LM_b) &gt;= abs(LM)) {
+        bcount &lt;- bcount + 1
+      }
+      
+      W[i] &lt;- LM_b
+    }
+    
+    pvalues_boot &lt;- c(pvalues_boot, bcount/1000)
+    
+  }
+  
+  # final data.frame
+  tst &lt;- bind_rows(tst, 
+                   tibble(
+                     sample_size = k,
+                     pvalues_boot = pvalues_boot,
+                     pvalues = pvalues_orig))
+  
+}</code></pre>
+<p>And finally, this is the result, which shows —as the authors state— an improvement in the outcome for small samples.</p>
+<p><img src="/posts/2020-05-04-bootstrapped-white-s-test-for-homoskedasticity-check-in-small-samples_files/figure-html/unnamed-chunk-3-1.png" width="110%" /></p>

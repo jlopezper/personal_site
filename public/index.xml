@@ -6,10 +6,21 @@
     <description>Recent content on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 29 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 04 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Bootstrapped White&#39;s test for checking homoskedasticity in small samples</title>
+      <link>/posts/bootstrapped-white-s-test-for-homoskedasticity-check-in-small-samples/</link>
+      <pubDate>Mon, 04 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/bootstrapped-white-s-test-for-homoskedasticity-check-in-small-samples/</guid>
+      <description>I came across this paper where the authors developed a bootstrapped version of the well-known White test. This test checks whether the variance of the residuals in a linear regression model is constant (homoskedasticity). Remember that this is one of the assumptions for a linear regression model to be valid.
+The test statistic can be formulated as:
+ \(W = nR^2\)  where \(n\) is the number of observations and \(R^2\) is the R-squared of the auxiliary regression of the residuals against fitted values (further details for example here).</description>
+    </item>
     
     <item>
       <title>This is why you should consider using model-based clustering</title>
