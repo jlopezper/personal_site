@@ -146,7 +146,11 @@ tidyr::gather(tst2, -sample_size, key='ptypes', value='values') %>%
         legend.text = element_text(size=11),
         axis.text  = element_text(size=11),
         axis.title  = element_text(size=11),
-        legend.position = 'bottom') 
+        legend.position = 'bottom',
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black")) 
 ```
 
 
