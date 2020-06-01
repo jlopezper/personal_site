@@ -9,7 +9,7 @@ I graduated in Economics at [University of Las Palmas de Gran Canaria](https://w
 
 I am a R enthusiast as well as interested in Statistics, Economics, Politics and… a devoted supporter of my football team, UD Las Palmas.
 
-Check out my resume [here](jorge_lopez_perez_feb19.pdf) (updated December 2018).
+Check out my resume [here](jorge_lopez_perez.pdf) (updated June 2019).
 
 
 --
