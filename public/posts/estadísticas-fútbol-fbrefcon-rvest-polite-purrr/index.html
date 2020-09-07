@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Jorge López Pérez">
+    <meta name="description" content="Personal website">
+    <meta name="keywords" content="blog,developer,personal">
+
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Scraping de estadísticas de fútbol con `rvest`, `polite` y `purrr`."/>
+<meta name="twitter:description" content="En este post me gustaría introducir la potencialidad del web scraping a través rvest y de la programación funcional de la mano de purrr. Además de estos paquetes que he destacado, como siempre, me apoyaré en algún otro paquete de la familia Tidyverse, como dplyr y tidyr.
+Para este propósito, voy a utilizar la completa web de FBREF, que provee estadísticas muy detalladas de equipos y jugadores de fútbol. Para aquellos que les guste la analítica avanzada en este deporte, en FBREF pueden encontrar métricas más complejas, como el xG."/>
+
+
+    <base href="/posts/estad%C3%ADsticas-f%C3%BAtbol-fbrefcon-rvest-polite-purrr/">
+    <title>
+  Scraping de estadísticas de fútbol con `rvest`, `polite` y `purrr`. · Jorge López
+</title>
+
+    <link rel="canonical" href="/posts/estad%C3%ADsticas-f%C3%BAtbol-fbrefcon-rvest-polite-purrr/">
+
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Merriweather:300,700|Source+Code+Pro:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" integrity="sha256-oSrCnRYXvHG31SBifqP2PM1uje7SJUyX0nTwO2RJV54=" crossorigin="anonymous" />
+
+    
+      
+      
+      <link rel="stylesheet" href="/css/coder.min.ac37073bc2826cd28ef57364a9fe339de7ebcb26dafc22fd832cb35cf5b1d048.css" integrity="sha256-rDcHO8KCbNKO9XNkqf4znefryyba/CL9gyyzXPWx0Eg=" crossorigin="anonymous" media="screen" />
+    
+
+    
+
+    
+
+    
+
+    <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+    
+
+    <meta name="generator" content="Hugo 0.59.1" />
+  </head>
+
+  <body class=" ">
+    <main class="wrapper">
+      <link rel="stylesheet" href="/css/routeros.css" rel="stylesheet" id="theme-stylesheet">
+<script src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<nav class="navigation">
+  <section class="container">
+    <a class="navigation-title" href="/">
+      Jorge López
+    </a>
+    <input type="checkbox" id="menu-toggle" />
+    <label class="menu-button float-right" for="menu-toggle"><i class="fas fa-bars"></i></label>
+    <ul class="navigation-list">
+      
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/about/">About</a>
+          </li>
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/posts/">Blog</a>
+          </li>
+        
+          <li class="navigation-item">
+            <a class="navigation-link" href="/contact/">Contact</a>
+          </li>
+        
+      
+      
+    </ul>
+  </section>
+</nav>
+
+
+      <div class="content">
+        
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">Scraping de estadísticas de fútbol con `rvest`, `polite` y `purrr`.</h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fas fa-calendar"></i>
+              <time datetime='2020-09-01T00:00:00Z'>
+                September 1, 2020
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fas fa-clock"></i>
+              7 minutes read
+            </span>
+          </div>
+          <div class="categories">
+  <i class="fas fa-folder"></i>
+    <a href="/categories/rstats/">rstats</a></div>
+
+          <div class="tags">
+  <i class="fas fa-tag"></i>
+    <a href="/tags/football-analytics/">football analytics</a></div>
+
+        </div>
+      </header>
+
+      <div>
+        
+
+
+<p>En este post me gustaría introducir la potencialidad del <em>web scraping</em> a través <code>rvest</code> y de la programación funcional de la mano de <code>purrr</code>. Además de estos paquetes que he destacado, como siempre, me apoyaré en algún otro paquete de la familia Tidyverse, como <code>dplyr</code> y <code>tidyr</code>.</p>
+<p>Para este propósito, voy a utilizar la completa web de <a href="https://fbref.com/en/">FBREF</a>, que provee estadísticas muy detalladas de equipos y jugadores de fútbol. Para aquellos que les guste la analítica avanzada en este deporte, en FBREF pueden encontrar métricas más complejas, como el xG. En este caso, el objetivo final es tener las estadísticas disponibles en FBREF para cada jugador de la Primera División de España.</p>
+<p>En primer lugar, cargamos las librerías que se van a utilizar.</p>
+<pre class="r"><code># load libraries
+pkgs &lt;- c(&quot;rvest&quot;, &quot;polite&quot;, &quot;dplyr&quot;, &quot;tidyr&quot;, &quot;purrr&quot;, &quot;stringr&quot;, &quot;glue&quot;, &quot;rlang&quot;, &quot;janitor&quot;)
+invisible(lapply(pkgs, require, character.only = TRUE))</code></pre>
+<p>Como he dicho, este post tiene dos partes relevante: la del <strong>web scraping</strong> y la de la <strong>programación funcional</strong>. Para la primera de las partes nos apoyaremos en <code>rvest</code>, pero es muy importante señalar que la extracción de datos en sitios web se tiene que hacer de forma responsable. La forma correcta de hacerlo es conociendo los términos de uso, pero muchas webs también incorporan un fichero (<code>robots.txt</code>) que especifica los accesos para bots (como nosotros cuando hacemos scraping). Desafortunadamente, en muchos tutoriales que uno puede encontrarse para hacer web scraping tiende a obviar este importante aspecto. En definitiva, nuestras acciones sobre una determinada web pueden tener impacto sobre otros usuarios o sobre la propia web.</p>
+<p>Hay un fantástico paquete en R llamado <a href="https://dmi3kno.github.io/polite/"><code>polite</code></a> que se encarga de buscar este fichero <code>robots.txt</code>, extraer los permisos de acceso e indicarle a la web el agente que está realizando el scraping.</p>
+<p>Lo primero que vamos a hacer es extraer la URL de todos los equipos de la Primera División. A partir de estas URL vamos a extraer las propias para cada jugador. Estas son las funciones que realizan ambas acciones.</p>
+<pre class="r"><code>get_teams &lt;- function(url_league) {
+  session &lt;- bow(url_league,
+                 user_agent = &#39;Scrapping FBREF tutorial&#39;)
+  
+  teams &lt;-
+    scrape(session) %&gt;% 
+    html_nodes(xpath = &#39;//*[@id=&quot;results32391_overall&quot;]/tbody/tr/td[1]/a&#39;)
+  
+  tibble(
+    team = teams %&gt;% html_text(),
+    url_team = paste0(&quot;https://fbref.com&quot;, teams %&gt;% html_attr(&quot;href&quot;))
+  )
+}
+
+get_player &lt;- function(url_team) {
+  session &lt;- bow(url_team,
+                 user_agent = &#39;Scrapping FBREF tutorial&#39;)
+  
+  players &lt;-
+    scrape(session) %&gt;%  
+    html_nodes(xpath = &#39;//*[@id=&quot;stats_standard_3239&quot;]/tbody/tr/th/a&#39;) 
+  
+  tibble(
+    url_team = url_team,
+    player = players %&gt;% html_text(),
+    url_player = paste0(&quot;https://fbref.com&quot;, players %&gt;% html_attr(&quot;href&quot;))
+  )
+}</code></pre>
+<p>Lo primero que se hace es leer la URL y, a partir de aquí, tenemos que buscar el nodo que recoge la información que estamos buscando. Esto se puede hacer inspeccionando el código fuente de la web y buscando el nodo de interés, como se puede ver en la siguiente captura.</p>
+<p><img src="/posts/2020-09-01-estadísticas-fútbol-fbrefcon-rvest-polite-purrr_files/inspect_web.jpg" /></p>
+<p>Ahora, extraemos para cada equipo su URL y lo almacenamos en el data.frame <code>all_teams</code>. Con cada una de estas URL podemos acceder a las URL de cada jugador y para ello hacemos uso de <code>purrr::map</code>, que nos permite ir iterando sobre cada una de las URL de los equipos para extraer todas las URL de los jugadores. Con unas pocas líneas de código, aprovechando las bondades de la programación funcional con <code>purrr</code>, tenemos la llave para acceder a las estadísticas de los jugadores.</p>
+<pre class="r"><code># Extraemos las URL de los equipos
+all_teams &lt;- get_teams(&quot;https://fbref.com/en/comps/12/La-Liga-Stats&quot;)
+all_teams</code></pre>
+<pre><code>## # A tibble: 20 x 2
+##    team            url_team                                                  
+##    &lt;chr&gt;           &lt;chr&gt;                                                     
+##  1 Real Madrid     https://fbref.com/en/squads/53a2f082/Real-Madrid-Stats    
+##  2 Barcelona       https://fbref.com/en/squads/206d90db/Barcelona-Stats      
+##  3 Atlético Madrid https://fbref.com/en/squads/db3b9613/Atletico-Madrid-Stats
+##  4 Sevilla         https://fbref.com/en/squads/ad2be733/Sevilla-Stats        
+##  5 Villarreal      https://fbref.com/en/squads/2a8183b3/Villarreal-Stats     
+##  6 Real Sociedad   https://fbref.com/en/squads/e31d1cd9/Real-Sociedad-Stats  
+##  7 Granada         https://fbref.com/en/squads/a0435291/Granada-Stats        
+##  8 Getafe          https://fbref.com/en/squads/7848bd64/Getafe-Stats         
+##  9 Valencia        https://fbref.com/en/squads/dcc91a7b/Valencia-Stats       
+## 10 Osasuna         https://fbref.com/en/squads/03c57e2b/Osasuna-Stats        
+## 11 Athletic Club   https://fbref.com/en/squads/2b390eca/Athletic-Club-Stats  
+## 12 Levante         https://fbref.com/en/squads/9800b6a1/Levante-Stats        
+## 13 Valladolid      https://fbref.com/en/squads/17859612/Valladolid-Stats     
+## 14 Eibar           https://fbref.com/en/squads/bea5c710/Eibar-Stats          
+## 15 Betis           https://fbref.com/en/squads/fc536746/Real-Betis-Stats     
+## 16 Alavés          https://fbref.com/en/squads/8d6fd021/Alaves-Stats         
+## 17 Celta Vigo      https://fbref.com/en/squads/f25da7fb/Celta-Vigo-Stats     
+## 18 Leganés         https://fbref.com/en/squads/7c6f2c78/Leganes-Stats        
+## 19 Mallorca        https://fbref.com/en/squads/2aa12281/Mallorca-Stats       
+## 20 Espanyol        https://fbref.com/en/squads/a8661628/Espanyol-Stats</code></pre>
+<pre class="r"><code># Extraemos las URL de los jugadores
+all_players &lt;- purrr::map_df(.x = all_teams$url_team, ~ get_player(.))
+all_players</code></pre>
+<pre><code>## # A tibble: 666 x 3
+##    url_team                        player       url_player                      
+##    &lt;chr&gt;                           &lt;chr&gt;        &lt;chr&gt;                           
+##  1 https://fbref.com/en/squads/53… Karim Benze… https://fbref.com/en/players/70…
+##  2 https://fbref.com/en/squads/53… Casemiro     https://fbref.com/en/players/4d…
+##  3 https://fbref.com/en/squads/53… Sergio Ramos https://fbref.com/en/players/08…
+##  4 https://fbref.com/en/squads/53… Thibaut Cou… https://fbref.com/en/players/18…
+##  5 https://fbref.com/en/squads/53… Raphaël Var… https://fbref.com/en/players/9f…
+##  6 https://fbref.com/en/squads/53… Dani Carvaj… https://fbref.com/en/players/49…
+##  7 https://fbref.com/en/squads/53… Toni Kroos   https://fbref.com/en/players/6c…
+##  8 https://fbref.com/en/squads/53… Luka Modrić  https://fbref.com/en/players/60…
+##  9 https://fbref.com/en/squads/53… Federico Va… https://fbref.com/en/players/09…
+## 10 https://fbref.com/en/squads/53… Ferland Men… https://fbref.com/en/players/3c…
+## # … with 656 more rows</code></pre>
+<pre class="r"><code># Unimos la informacion
+teams_players &lt;- 
+  all_players %&gt;% 
+  left_join(all_teams, by = &quot;url_team&quot;)
+
+teams_players</code></pre>
+<pre><code>## # A tibble: 666 x 4
+##    url_team                     player      url_player                   team   
+##    &lt;chr&gt;                        &lt;chr&gt;       &lt;chr&gt;                        &lt;chr&gt;  
+##  1 https://fbref.com/en/squads… Karim Benz… https://fbref.com/en/player… Real M…
+##  2 https://fbref.com/en/squads… Casemiro    https://fbref.com/en/player… Real M…
+##  3 https://fbref.com/en/squads… Sergio Ram… https://fbref.com/en/player… Real M…
+##  4 https://fbref.com/en/squads… Thibaut Co… https://fbref.com/en/player… Real M…
+##  5 https://fbref.com/en/squads… Raphaël Va… https://fbref.com/en/player… Real M…
+##  6 https://fbref.com/en/squads… Dani Carva… https://fbref.com/en/player… Real M…
+##  7 https://fbref.com/en/squads… Toni Kroos  https://fbref.com/en/player… Real M…
+##  8 https://fbref.com/en/squads… Luka Modrić https://fbref.com/en/player… Real M…
+##  9 https://fbref.com/en/squads… Federico V… https://fbref.com/en/player… Real M…
+## 10 https://fbref.com/en/squads… Ferland Me… https://fbref.com/en/player… Real M…
+## # … with 656 more rows</code></pre>
+<p>Ahora, la parte más interesante. Si entramos en la URL de un <a href="https://fbref.com/en/players/335fa267/Sergi-Roberto">jugador</a> en concreto, vemos que FBREF presenta distintas estadísticas que agrupa en distintas tablas (Standard Stats, Shooting, Passing, etc). Un planteamiento para extraer toda la información de las distintas tablas podría ser el siguiente. Creamos primero una función genérica que llamaremos <code>extract_table</code>, cuya labor es la de extraer la información de las tablas.</p>
+<pre class="r"><code>extract_table &lt;- function(url,xpath=NULL) {
+  
+  session &lt;- bow(url,
+                 user_agent = &#39;Scrapping FBREF tutorial&#39;)
+  
+  # extract raw table
+  raw_table &lt;- 
+    scrape(session) %&gt;% 
+    html_nodes(xpath = xpath) %&gt;% 
+    rvest::html_table() %&gt;% 
+    pluck(1)
+  
+  # set unique names
+  names(raw_table) &lt;- make.names(raw_table[1,], unique = TRUE)
+  
+  raw_table[-1,]
+}</code></pre>
+<p>Ahora con la siguiente función tomamos todos los nodos donde podemos localizar las tablas y extraemos su información con la función previa. Utilizando de nuevo <code>purrr::map</code> y una misma función podemos extraer las estadísticas de todas las tablas. A partir de aquí, filtramos para obtener la información de la última temporada de Primera División.</p>
+<pre class="r"><code>exclude_vars &lt;- c(&#39;Season&#39; ,&#39;Age&#39;, &#39;Squad&#39;, &#39;Country&#39;, &#39;Comp&#39;, &#39;LgRank&#39;, &#39;Matches&#39;, &#39;Min&#39;)
+
+extract_all_stats &lt;- function(url) {
+
+  tables_xpath &lt;- c(&#39;//*[@id=&quot;stats_standard_dom_lg&quot;]&#39;,
+                    &#39;//*[@id=&quot;stats_shooting_dom_lg&quot;]&#39;,
+                    &#39;//*[@id=&quot;stats_passing_dom_lg&quot;]&#39;,
+                    &#39;//*[@id=&quot;stats_passing_types_dom_lg&quot;]&#39;,
+                    &#39;//*[@id=&quot;stats_gca_dom_lg&quot;]&#39;,
+                    &#39;//*[@id=&quot;stats_defense_dom_lg&quot;]&#39;,
+                    &#39;//*[@id=&quot;stats_possession_dom_lg&quot;]&#39;,
+                    &#39;//*[@id=&quot;stats_misc_dom_lg&quot;]&#39;)
+  
+  all_stats &lt;- map(.x = tables_xpath, .f = ~extract_table(url, xpath = .))
+  
+  joined_stats &lt;- 
+    bind_cols(map(.x = all_stats, 
+                                .f = function(x) {
+                                  x %&gt;% 
+                                    filter(Season == &#39;2019-2020&#39;, Comp == &#39;1. La Liga&#39;) %&gt;% 
+                                    select_if(!names(.) %in% exclude_vars) %&gt;% 
+                                    mutate(across(.cols = everything(),
+                                                  .fns = as.numeric))
+                                }), .name_repair = &#39;minimal&#39;)
+  
+  
+  
+  out &lt;- 
+    bind_cols(all_stats[[1]] %&gt;% 
+                     filter(Season == &#39;2019-2020&#39;, Comp == &#39;1. La Liga&#39;) %&gt;% 
+                     select(all_of(exclude_vars)), joined_stats, .name_repair = &#39;minimal&#39;) %&gt;% 
+    clean_names()
+  
+  out  
+}</code></pre>
+<p>Finalmente, antes de iterar sobre todas las URL de los jugadores y extraer sus estadísticas, creamos una segunda función con <code>purrr::safely</code> que lo que permite es recoger, en cada iteración, una lista con dos slots: el resultado de la misma y el error (si lo hubiera). Esto hace que el proceso iterativo no se pare incluso aunque para una URL concreta no encontrara una de las tablas. En concreto, esto ocurre para algunos jugadores con muy poca participación, como canteranos de los equipos.</p>
+<pre class="r"><code>tst &lt;- readRDS(&#39;~/r_devs/personal_site/content/temp/stats_players.rds&#39;)</code></pre>
+<pre class="r"><code>safe_extract_all_stats &lt;- safely(extract_all_stats)
+tst &lt;- purrr::map(.x = teams_players$url_player, ~ safe_extract_all_stats(.))</code></pre>
+<p>Finalmente, nos quedamos con aquellos jugadores de los que pudimos extraer todas sus estadísticas. Ahora solo faltaría limpiar un poco el data.frame y ya estaría!</p>
+<pre class="r"><code>tst %&gt;% 
+  map(&#39;result&#39;) %&gt;% 
+  compact() %&gt;%
+  bind_rows() %&gt;% 
+  .[,1:10] %&gt;% 
+  head()</code></pre>
+<pre><code>##      season age       squad country       comp lg_rank matches   min mp starts
+## 1 2019-2020  31 Real Madrid  es ESP 1. La Liga     1st Matches 3,141 37     36
+## 2 2019-2020  27 Real Madrid  es ESP 1. La Liga     1st Matches 3,088 35     35
+## 3 2019-2020  33 Real Madrid  es ESP 1. La Liga     1st Matches 3,013 35     35
+## 4 2019-2020  27 Real Madrid  es ESP 1. La Liga     1st Matches 3,060 34     34
+## 5 2019-2020  26 Real Madrid  es ESP 1. La Liga     1st Matches 2,822 32     32
+## 6 2019-2020  27 Real Madrid  es ESP 1. La Liga     1st Matches 2,738 31     31</code></pre>
+<p>__</p>
+<p>If you find this information useful, you might consider…</p>
+<p><a href="https://www.buymeacoffee.com/jorgelopez" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-black.png" alt="Buy Me A Coffee" style="height: 35px !important;width: 150px !important;" ></a></p>
+
+      </div>
+
+      <footer>
+        <div id="disqus_thread"></div>
+<script>
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://jlopezper.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      </footer>
+    </article>
+
+    
+  </section>
+
+      </div>
+
+      <footer class="footer">
+  <section class="container">
+    
+     © 2020
+    
+       · 
+      Powered by <a href="https://gohugo.io/">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/">Coder</a>.
+    
+    
+       · 
+      [<a href="https://github.com/luizdepra/hugo-coder/tree/"></a>]
+    
+  </section>
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+  });
+  MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+
+  MathJax.Hub.Config({
+  
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+  });
+</script> 
+</footer>
+
+
+
+    </main>
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-163611522-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+
+  </body>
+
+</html>

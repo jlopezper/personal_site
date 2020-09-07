@@ -1,0 +1,189 @@
+---
+title: Scraping de estadísticas de fútbol con `rvest`, `polite` y `purrr`.
+author: Jorge López
+date: '2020-09-01'
+slug: estadísticas-fútbol-fbrefcon-rvest-polite-purrr
+categories:
+  - rstats
+tags:
+  - football analytics
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=8, fig.height=5.5) 
+```
+
+
+En este post me gustaría introducir la potencialidad del *web scraping* a través `rvest` y de la programación funcional de la mano de `purrr`. Además de estos paquetes que he destacado, como siempre, me apoyaré en algún otro paquete de la familia Tidyverse, como `dplyr` y `tidyr`. 
+
+Para este propósito, voy a utilizar la completa web de [FBREF](https://fbref.com/en/), que provee estadísticas muy detalladas de equipos y jugadores de fútbol. Para aquellos que les guste la analítica avanzada en este deporte, en FBREF pueden encontrar métricas más complejas, como el xG. En este caso, el objetivo final es tener las estadísticas disponibles en FBREF para cada jugador de la Primera División de España. 
+
+En primer lugar, cargamos las librerías que se van a utilizar.
+
+```{r echo=TRUE, message=FALSE}
+# load libraries
+pkgs <- c("rvest", "polite", "dplyr", "tidyr", "purrr", "stringr", "glue", "rlang", "janitor")
+invisible(lapply(pkgs, require, character.only = TRUE))
+```
+
+
+Como he dicho, este post tiene dos partes relevante: la del **web scraping** y la de la **programación funcional**. Para la primera de las partes nos apoyaremos en `rvest`, pero es muy importante señalar que la extracción de datos en sitios web se tiene que hacer de forma responsable. La forma correcta de hacerlo es conociendo los términos de uso, pero muchas webs también incorporan un fichero (`robots.txt`) que especifica los accesos para bots (como nosotros cuando hacemos scraping). Desafortunadamente, en muchos tutoriales que uno puede encontrarse para hacer web scraping tiende a obviar este importante aspecto. En definitiva, nuestras acciones sobre una determinada web pueden tener impacto sobre otros usuarios o sobre la propia web. 
+
+Hay un fantástico paquete en R llamado [`polite`](https://dmi3kno.github.io/polite/) que se encarga de buscar este fichero `robots.txt`, extraer los permisos de acceso e indicarle a la web el agente que está realizando el scraping.
+
+
+Lo primero que vamos a hacer es extraer la URL de todos los equipos de la Primera División. A partir de estas URL vamos a extraer las propias para cada jugador. Estas son las funciones que realizan ambas acciones.
+
+```{r}
+get_teams <- function(url_league) {
+  session <- bow(url_league,
+                 user_agent = 'Scrapping FBREF tutorial')
+  
+  teams <-
+    scrape(session) %>% 
+    html_nodes(xpath = '//*[@id="results32391_overall"]/tbody/tr/td[1]/a')
+  
+  tibble(
+    team = teams %>% html_text(),
+    url_team = paste0("https://fbref.com", teams %>% html_attr("href"))
+  )
+}
+
+get_player <- function(url_team) {
+  session <- bow(url_team,
+                 user_agent = 'Scrapping FBREF tutorial')
+  
+  players <-
+    scrape(session) %>%  
+    html_nodes(xpath = '//*[@id="stats_standard_3239"]/tbody/tr/th/a') 
+  
+  tibble(
+    url_team = url_team,
+    player = players %>% html_text(),
+    url_player = paste0("https://fbref.com", players %>% html_attr("href"))
+  )
+}
+```
+
+
+Lo primero que se hace es leer la URL y, a partir de aquí, tenemos que buscar el nodo que recoge la información que estamos buscando. Esto se puede hacer inspeccionando el código fuente de la web y buscando el nodo de interés, como se puede ver en la siguiente captura.
+
+![](/posts/2020-09-01-estadísticas-fútbol-fbrefcon-rvest-polite-purrr_files/inspect_web.jpg)
+
+Ahora, extraemos para cada equipo su URL y lo almacenamos en el data.frame `all_teams`. Con cada una de estas URL podemos acceder a las URL de cada jugador y para ello hacemos uso de `purrr::map`, que nos permite ir iterando sobre cada una de las URL de los equipos para extraer todas las URL de los jugadores. Con unas pocas líneas de código, aprovechando las bondades de la programación funcional con `purrr`, tenemos la llave para acceder a las estadísticas de los jugadores.
+
+```{r}
+# Extraemos las URL de los equipos
+all_teams <- get_teams("https://fbref.com/en/comps/12/La-Liga-Stats")
+all_teams
+
+# Extraemos las URL de los jugadores
+all_players <- purrr::map_df(.x = all_teams$url_team, ~ get_player(.))
+all_players
+
+
+# Unimos la informacion
+teams_players <- 
+  all_players %>% 
+  left_join(all_teams, by = "url_team")
+
+teams_players
+```
+
+
+Ahora, la parte más interesante. Si entramos en la URL de un [jugador](https://fbref.com/en/players/335fa267/Sergi-Roberto) en concreto, vemos que FBREF presenta distintas estadísticas que agrupa en distintas tablas (Standard Stats, Shooting, Passing, etc). Un planteamiento para extraer toda la información de las distintas tablas podría ser el siguiente. Creamos primero una función genérica que llamaremos `extract_table`, cuya labor es la de extraer la información de las tablas.
+
+```{r}
+extract_table <- function(url,xpath=NULL) {
+  
+  session <- bow(url,
+                 user_agent = 'Scrapping FBREF tutorial')
+  
+  # extract raw table
+  raw_table <- 
+    scrape(session) %>% 
+    html_nodes(xpath = xpath) %>% 
+    rvest::html_table() %>% 
+    pluck(1)
+  
+  # set unique names
+  names(raw_table) <- make.names(raw_table[1,], unique = TRUE)
+  
+  raw_table[-1,]
+}
+```
+
+
+Ahora con la siguiente función tomamos todos los nodos donde podemos localizar las tablas y extraemos su información con la función previa. Utilizando de nuevo `purrr::map` y una misma función podemos extraer las estadísticas de todas las tablas. A partir de aquí, filtramos para obtener la información de la última temporada de Primera División. 
+
+
+```{r}
+exclude_vars <- c('Season' ,'Age', 'Squad', 'Country', 'Comp', 'LgRank', 'Matches', 'Min')
+
+extract_all_stats <- function(url) {
+
+  tables_xpath <- c('//*[@id="stats_standard_dom_lg"]',
+                    '//*[@id="stats_shooting_dom_lg"]',
+                    '//*[@id="stats_passing_dom_lg"]',
+                    '//*[@id="stats_passing_types_dom_lg"]',
+                    '//*[@id="stats_gca_dom_lg"]',
+                    '//*[@id="stats_defense_dom_lg"]',
+                    '//*[@id="stats_possession_dom_lg"]',
+                    '//*[@id="stats_misc_dom_lg"]')
+  
+  all_stats <- map(.x = tables_xpath, .f = ~extract_table(url, xpath = .))
+  
+  joined_stats <- 
+    bind_cols(map(.x = all_stats, 
+                                .f = function(x) {
+                                  x %>% 
+                                    filter(Season == '2019-2020', Comp == '1. La Liga') %>% 
+                                    select_if(!names(.) %in% exclude_vars) %>% 
+                                    mutate(across(.cols = everything(),
+                                                  .fns = as.numeric))
+                                }), .name_repair = 'minimal')
+  
+  
+  
+  out <- 
+    bind_cols(all_stats[[1]] %>% 
+                     filter(Season == '2019-2020', Comp == '1. La Liga') %>% 
+                     select(all_of(exclude_vars)), joined_stats, .name_repair = 'minimal') %>% 
+    clean_names()
+  
+  out  
+}
+```
+
+
+Finalmente, antes de iterar sobre todas las URL de los jugadores y extraer sus estadísticas, creamos una segunda función con `purrr::safely` que lo que permite es recoger, en cada iteración, una lista con dos slots: el resultado de la misma y el error (si lo hubiera). Esto hace que el proceso iterativo no se pare incluso aunque para una URL concreta no encontrara una de las tablas. En concreto, esto ocurre para algunos jugadores con muy poca participación, como canteranos de los equipos.
+
+```{r echo==FALSE}
+tst <- readRDS('~/r_devs/personal_site/content/temp/stats_players.rds')
+```
+
+
+```{r eval=FALSE}
+safe_extract_all_stats <- safely(extract_all_stats)
+tst <- purrr::map(.x = teams_players$url_player, ~ safe_extract_all_stats(.))
+```
+
+
+Finalmente, nos quedamos con aquellos jugadores de los que pudimos extraer todas sus estadísticas. Ahora solo faltaría limpiar un poco el data.frame y ya estaría!
+
+```{r message=FALSE}
+tst %>% 
+  map('result') %>% 
+  compact() %>%
+  bind_rows() %>% 
+  .[,1:10] %>% 
+  head()
+```
+
+__
+
+If you find this information useful, you might consider... 
+
+<a href="https://www.buymeacoffee.com/jorgelopez" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-black.png" alt="Buy Me A Coffee" style="height: 35px !important;width: 150px !important;" ></a>

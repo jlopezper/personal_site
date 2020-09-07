@@ -6,10 +6,20 @@
     <description>Recent content on Jorge López</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 04 May 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 01 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Scraping de estadísticas de fútbol con `rvest`, `polite` y `purrr`.</title>
+      <link>/posts/estad%C3%ADsticas-f%C3%BAtbol-fbrefcon-rvest-polite-purrr/</link>
+      <pubDate>Tue, 01 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/estad%C3%ADsticas-f%C3%BAtbol-fbrefcon-rvest-polite-purrr/</guid>
+      <description>En este post me gustaría introducir la potencialidad del web scraping a través rvest y de la programación funcional de la mano de purrr. Además de estos paquetes que he destacado, como siempre, me apoyaré en algún otro paquete de la familia Tidyverse, como dplyr y tidyr.
+Para este propósito, voy a utilizar la completa web de FBREF, que provee estadísticas muy detalladas de equipos y jugadores de fútbol. Para aquellos que les guste la analítica avanzada en este deporte, en FBREF pueden encontrar métricas más complejas, como el xG.</description>
+    </item>
     
     <item>
       <title>Bootstrapped White&#39;s test for checking homoskedasticity in small samples</title>
