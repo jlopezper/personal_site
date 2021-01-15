@@ -1,0 +1,47 @@
+---
+title: Serving a predictive model through an API with `plumber` in R
+author: Jorge López Pérez
+date: '2020-10-05'
+slug: serving-a-model-using-plumber-with-r
+categories: []
+tags: []
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=8, fig.height=5.5) 
+```
+
+
+In this post I will briefly introduce one more possibility that exists in R to deploy models in production. As stated in the `plumber` documentation, this package allows you to create a web API by decorating your existing R source code with special comments. For instance, suppose you have the file `send_message.R`:
+
+```{r eval=FALSE}
+#* Echo back the input
+#* @param msg The message to echo
+#* @get /echo
+function(msg="") {
+  list(msg = paste0("The message is: '", msg, "'"))
+}
+```
+
+The comments above allows you to make this function available as API endpoints. In this case you can pass a message through the `msg` parameter by using the `echo` endpoint. Now you can call this function as shown below:
+
+```{r}
+library(plumber)
+# 'plumber.R' is the location of the file shown above
+pr("send_message.R") %>%
+  pr_run(port=8000)
+```
+ 
+You will see your API running on the port 8000 in your localhost (`http://localhost:8000`), so if you do a request in the following endpoint and get the expected result:
+
+```{r eval=FALSE}
+$ curl "http://localhost:8000/echo?msg=hello"
+ {"msg":["The message is: 'hello'"]}
+```
+
+As you can see, this is a powerful tool. You might think about using this approach to build a predictive model and pass on new data to easily obtain the new predicted values.
+
+Then, we will create a model in a model.R file.
+
