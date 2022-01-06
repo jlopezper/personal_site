@@ -16,7 +16,7 @@ math = true
     description = "Jorge's personal website"
     keywords = "blog,developer,personal"
     info = "Economist and Data Scientist"
-    avatarurl = "images/autopic.jpeg"
+    avatarurl = "images/image0.JPG"
     footercontent = ""
 
     dateformat = "January 2, 2006"
@@ -65,7 +65,7 @@ math = true
         # You can configure the theme parameter for each language.
         [languages.en.params]
         author = "Jorge López Pérez"
-        info = "Economist / Data Scientist / R coder"
+        info = "Data Scientist"
         description = "Personal website"
         keywords = "blog,developer,personal"
 
